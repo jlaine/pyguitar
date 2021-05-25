@@ -1,0 +1,13 @@
+*.egg-info
+*.mid
+*.mp3
+*.wav
+*.pyc
+.coverage
+.eggs
+.idea
+.mypy_cache
+.vscode
+/build
+/dist
+/env

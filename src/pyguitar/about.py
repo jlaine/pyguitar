@@ -1,0 +1,7 @@
+__author__ = "Jeremy Lainé"
+__email__ = "jeremy.laine@m4x.org"
+__license__ = "BSD"
+__summary__ = "Python tools for guitar players"
+__title__ = "pyguitar"
+__uri__ = "https://github.com/jlaine/pyguitar"
+__version__ = "0.1.0"
