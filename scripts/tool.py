@@ -167,8 +167,23 @@ if __name__ == "__main__":
             "50s": {
                 "chord_pattern": "I vi IV V",
             },
+            "blueforyou": {
+                "beats_per_minute": 90,
+                "chord_pattern": "I7 IV7 I7 I7 " + "IV7 IV7 I7 I7 " + "V7 IV7 I7 V7",
+                "root": Note.D4,
+                "strum_pattern": "D-D-D-D-",
+            },
             "blues": {
-                "chord_pattern": "I I I I IV IV I I V IV I V",
+                "chord_pattern": "I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 V7",
+                "root": Note.A3,
+            },
+            "blues-quick-change": {
+                "chord_pattern": "I7 IV7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 V7",
+                "root": Note.A3,
+            },
+            "blues-slow-change": {
+                "chord_pattern": "I7 I7 I7 I7 IV7 IV7 I7 I7 V7 V7 I7 I7",
+                "root": Note.A3,
             },
             "blues7": {
                 "beats_per_minute": 130,
