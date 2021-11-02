@@ -3,7 +3,7 @@ import argparse
 from pychord import Chord
 from pychord.utils import note_to_val
 
-from pyguitar.notes import Note
+from pyguitar.notes import MINOR_SCALE, Namer, Note, shift
 
 FRETS = 18
 STRINGS = [Note.E2, Note.A2, Note.D3, Note.G3, Note.B3, Note.E4]
@@ -32,7 +32,7 @@ class Fretboard:
         string_spacing = 20
         board_width = string_spacing * (len(STRINGS) - 1)
         board_height = fret_spacing * FRETS
-        output = '<svg viewBox="0 0 %d %d" xmlns="http://www.w3.org/2000/svg">' % (
+        output = '<svg viewBox="0 0 %f %f" xmlns="http://www.w3.org/2000/svg">' % (
             board_width + 2 * padding,
             board_height + 2 * padding,
         )
@@ -40,7 +40,7 @@ class Fretboard:
         # draw strings
         for string_idx, string_note in enumerate(STRINGS):
             x = padding + string_idx * string_spacing
-            output += '<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="black"/>' % (
+            output += '<line x1="%f" y1="%f" x2="%f" y2="%f" stroke="black"/>' % (
                 x,
                 padding,
                 x,
@@ -50,7 +50,7 @@ class Fretboard:
         # draw frets
         for fret_idx in range(FRETS + 1):
             y = padding + fret_idx * fret_spacing
-            output += '<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="black"/>' % (
+            output += '<line x1="%f" y1="%f" x2="%f" y2="%f" stroke="black"/>' % (
                 padding,
                 y,
                 padding + board_width,
@@ -64,7 +64,7 @@ class Fretboard:
                     cx = padding + string_idx * string_spacing
                     cy = padding + (fret_idx + 0.5) * fret_spacing
                     output += (
-                        '<circle cx="%d" cy="%d" r="%d" stroke="%s" fill="white" />'
+                        '<circle cx="%d" cy="%f" r="%f" stroke="%s" fill="white" />'
                         % (
                             cx,
                             cy,
@@ -73,7 +73,7 @@ class Fretboard:
                         )
                     )
                     output += (
-                        '<text x="%d" y="%d" fill="%s" text-anchor="middle">%s</text>'
+                        '<text x="%f" y="%f" fill="%s" font-family="arial" font-size="12px" text-anchor="middle">%s</text>'
                         % (cx, cy + 4, cell["color"], cell["text"])
                     )
 
@@ -95,13 +95,23 @@ if __name__ == "__main__":
     options = parser.parse_args()
 
     board = Fretboard()
-    chord = Chord(options.chord)
 
-    note_colors = ["red", "green", "blue", "black"]
-    note_names = chord.components()
-    note_values = [note_to_val(x) for x in note_names]
+    if True:
+        # major chord
+        chord = Chord(options.chord)
+        note_colors = ["red", "green", "blue", "black"]
+        note_names = chord.components()
+        note_values = [note_to_val(x) for x in note_names]
+        note_names = ["R", "3", "5"]
+    else:
+        # minor pentatonic
+        root = note_to_val(options.chord)
+        namer = Namer(root)
+        note_colors = ["red", "green", "black", "blue", "black"]
+        note_values = [x % 12 for x in shift(root, (0, 3, 5, 7, 10))]
+        note_names = [namer.name_note(x) for x in note_values]
+        note_names = ["R", "3", "4", "5", "7"]
 
-    print(chord, note_names)
     for pos, note_value in board.walk():
         try:
             idx = note_values.index(note_value % 12)
