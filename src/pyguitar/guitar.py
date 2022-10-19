@@ -1,11 +1,7 @@
-import argparse
+from colorama import Back, Fore, Style
+from pyguitar.notes import Note
 
-from pychord import Chord
-from pychord.utils import note_to_val
-
-from pyguitar.notes import MINOR_SCALE, Namer, Note, shift
-
-FRETS = 18
+FRETS = 15
 STRINGS = [Note.E2, Note.A2, Note.D3, Note.G3, Note.B3, Note.E4]
 
 
@@ -14,16 +10,34 @@ class Fretboard:
         self._cells = [[None for x in STRINGS] for f in range(FRETS)]
 
     def dump(self):
-        indent = "   "
-        width = 31
-        lines = []
-        for idx, row in enumerate(self._cells):
-            row = ["%2s" % (x["text"] if x else "") for x in row]
-            lines.append(("%.2d | " % idx) + (" | ".join(row)) + " |")
-            if idx:
-                lines.append(indent + ("-" * width))
+        def pad(i):
+            l = len(i)
+            if l == 1:
+                return " " + i + " "
+            elif l == 2:
+                return " " + i
             else:
-                lines.append(indent + ("=" * width))
+                return i
+
+        indent = "   "
+        lines = []
+        width = 5 * len(STRINGS) - 2
+        for idx, row in enumerate(self._cells):
+            row = [
+                (
+                    (getattr(Fore, x["color"].upper()) + pad(x["text"]) + Fore.BLACK)
+                    if x
+                    else (Fore.BLACK + pad("|") + Fore.RESET)
+                )
+                for x in row
+            ]
+            lines.append(
+                ("%.2d " % idx) + Back.WHITE + "  ".join(row) + Style.RESET_ALL
+            )
+            marker = "-" if idx else "="
+            lines.append(
+                indent + Back.WHITE + Fore.BLACK + (marker * width) + Style.RESET_ALL
+            )
         return "\n".join(lines)
 
     def dump_svg(self):
@@ -87,38 +101,3 @@ class Fretboard:
         for string_idx, string_note in enumerate(STRINGS):
             for fret in range(FRETS):
                 yield (fret, string_idx), string_note + fret
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Play with notes")
-    parser.add_argument("chord")
-    options = parser.parse_args()
-
-    board = Fretboard()
-
-    if True:
-        # major chord
-        chord = Chord(options.chord)
-        note_colors = ["red", "green", "blue", "black"]
-        note_names = chord.components()
-        note_values = [note_to_val(x) for x in note_names]
-        note_names = ["R", "3", "5"]
-    else:
-        # minor pentatonic
-        root = note_to_val(options.chord)
-        namer = Namer(root)
-        note_colors = ["red", "green", "black", "blue", "black"]
-        note_values = [x % 12 for x in shift(root, (0, 3, 5, 7, 10))]
-        note_names = [namer.name_note(x) for x in note_values]
-        note_names = ["R", "3", "4", "5", "7"]
-
-    for pos, note_value in board.walk():
-        try:
-            idx = note_values.index(note_value % 12)
-        except ValueError:
-            continue
-        board.set(pos, {"color": note_colors[idx], "text": note_names[idx]})
-    print(board.dump())
-
-    with open("board.svg", "w") as fp:
-        fp.write(board.dump_svg())
