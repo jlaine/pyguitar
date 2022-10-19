@@ -32,7 +32,7 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     packages=["pyguitar"],
-    install_requires=["colorama", "mido", "scipy"],
+    install_requires=["colorama", "mido", "mingus", "scipy"],
     extras_require={
         "dev": [
             "black",

@@ -1,20 +1,22 @@
 import argparse
-from typing import Dict, List, Tuple
 
 import mido
+from mingus.core import chords, keys, scales
 
+from pyguitar.chords import roman_to_name
 from pyguitar.notes import (
-    MAJOR_SCALE,
+    MAJOR_SCALE_ROMAN,
     MAJOR_TRIAD,
-    MINOR_SCALE,
+    MINOR_SCALE_ROMAN,
     Namer,
     Note,
+    prettify,
     scale_chords,
     shift,
 )
 
 
-def print_scale_chords(root: int, minor: bool, chords: Dict[str, List[int]]) -> None:
+def print_scale_chords(root: int, minor: bool, chords: dict[str, list[int]]) -> None:
     namer = Namer(root)
 
     print("==", namer.name_note(root), "minor" if minor else "major", "key", "==")
@@ -29,23 +31,7 @@ def print_scale_chords(root: int, minor: bool, chords: Dict[str, List[int]]) -> 
         )
 
 
-def print_scale_notes(root: int, minor: bool) -> None:
-    namer = Namer(root)
-    if minor:
-        pitches = MINOR_SCALE
-    else:
-        pitches = MAJOR_SCALE
-    scale = shift(root, pitches)
-    print(
-        "%-8s : %s"
-        % (
-            namer.name_scale(scale),
-            " ".join(["%-2s" % namer.name_note(note) for note in scale]),
-        )
-    )
-
-
-def parse_chord_pattern(root: int, minor: bool, pattern: str) -> List[List[int]]:
+def parse_chord_pattern(root: int, minor: bool, pattern: str) -> list[list[int]]:
     chords = scale_chords(root, minor)
     for bit in ["IV", "V"]:
         if bit not in chords:
@@ -65,7 +51,7 @@ def parse_chord_pattern(root: int, minor: bool, pattern: str) -> List[List[int]]
     return output
 
 
-def parse_strum_pattern(pattern: str, beat_time=480) -> List[List[Tuple[str, int]]]:
+def parse_strum_pattern(pattern: str, beat_time=480) -> list[list[tuple[str, int]]]:
     output = []
     for chunk in pattern.split("/"):
         events = []
@@ -84,7 +70,7 @@ def parse_strum_pattern(pattern: str, beat_time=480) -> List[List[Tuple[str, int
 
 
 def play_midi_chord(
-    *, track: mido.MidiTrack, chord: List[int], strum: List[Tuple[str, int]]
+    *, track: mido.MidiTrack, chord: list[int], strum: list[tuple[str, int]]
 ):
     for event, time in strum:
         track.append(mido.Message(event, note=chord[0], time=time))
@@ -142,26 +128,42 @@ if __name__ == "__main__":
     parser.add_argument("--song")
     options = parser.parse_args()
 
+    roots = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
+    roots = ["C", "G", "D", "A", "E", "B", "F#", "C#", "Ab", "Eb", "Bb", "F"]
+
     if options.command == "chords":
-        for root in [
-            Note.C3,
-            Note.G3,
-            Note.D3,
-            Note.A3,
-            Note.E3,
-            Note.B3,
-            Note.G3 - 1,
-            Note.D3 - 1,
-            Note.A3 - 1,
-            Note.E3 - 1,
-            Note.B3 - 1,
-            Note.F3,
-        ]:
-            chords = scale_chords(root, minor=options.minor, sevenths=False)
-            print_scale_chords(root, minor=options.minor, chords=chords)
+        for root in roots:
+            key = keys.Key(root.lower() if options.minor else root)
+
+            print("== %s %s key ==" % (prettify(key.key), key.mode))
+            for roman in MINOR_SCALE_ROMAN if options.minor else MAJOR_SCALE_ROMAN:
+                chord_name = roman_to_name(roman, key.key)
+                print(
+                    "%-5s %-4s : %s"
+                    % (
+                        roman,
+                        prettify(chord_name),
+                        " ".join(
+                            [
+                                "%-2s" % prettify(note)
+                                for note in chords.from_shorthand(chord_name)
+                            ]
+                        ),
+                    )
+                )
+
     elif options.command == "notes":
-        for root in range(Note.C3, Note.C4):
-            print_scale_notes(root, minor=options.minor)
+        for root in roots:
+            scale = scales.NaturalMinor(root) if options.minor else scales.Major(root)
+            print(
+                "%-8s : %s"
+                % (
+                    prettify(scale.tonic) + " " + scale.type,
+                    " ".join(
+                        ["%-2s" % prettify(note) for note in scale.ascending()[0:7]]
+                    ),
+                )
+            )
     else:
         songs = {
             "50s": {

@@ -137,6 +137,10 @@ def note_name_to_int(name: str) -> int:
     raise ValueError("Unknown note %s" % name)
 
 
+def prettify(note):
+    return note.replace("b", "♭").replace("#", "♯").replace("dim", "°")
+
+
 def scale_chords(root: int, minor: bool, sevenths=True) -> Dict[str, List[int]]:
     if minor:
         scale = shift(root, MINOR_SCALE)
