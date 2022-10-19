@@ -1,4 +1,5 @@
 from colorama import Back, Fore, Style
+
 from pyguitar.notes import Note
 
 FRETS = 15
@@ -11,10 +12,9 @@ class Fretboard:
 
     def dump(self):
         def pad(i):
-            l = len(i)
-            if l == 1:
+            if len(i) == 1:
                 return " " + i + " "
-            elif l == 2:
+            elif len(i) == 2:
                 return " " + i
             else:
                 return i

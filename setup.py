@@ -36,8 +36,9 @@ setuptools.setup(
     extras_require={
         "dev": [
             "black",
-            "isort",
+            "coverage",
             "flake8",
+            "isort",
         ]
     },
 )

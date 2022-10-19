@@ -109,6 +109,17 @@ def unshift(notes: Sequence[int]) -> Tuple[int, List[int]]:
     return root, [x - root for x in notes]
 
 
+def key_note_names(key: str) -> list[str]:
+    """
+    Return the list of note names in the given `key`.
+    """
+    root_pitch = note_name_to_int(key.upper())
+    minor = key == key.lower()
+    namer = Namer(root_pitch)
+    pitches = shift(root_pitch, MINOR_SCALE if minor else MAJOR_SCALE)
+    return [uglify(namer.name_note(p)) for p in pitches]
+
+
 def make_chords(
     scale: Sequence[int], roman: Sequence[str], sevenths: bool
 ) -> Dict[str, List[int]]:
@@ -135,6 +146,14 @@ def note_name_to_int(name: str) -> int:
         if name in names:
             return value
     raise ValueError("Unknown note %s" % name)
+
+
+def prettify(note):
+    return note.replace("b", "♭").replace("#", "♯").replace("dim", "°")
+
+
+def uglify(note):
+    return note.replace("♭", "b").replace("♯", "#").replace("°", "dim")
 
 
 def scale_chords(root: int, minor: bool, sevenths=True) -> Dict[str, List[int]]:
