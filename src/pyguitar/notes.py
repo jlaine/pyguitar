@@ -130,6 +130,13 @@ def make_chords(
     return chords
 
 
+def note_name_to_int(name: str) -> int:
+    for value, names in enumerate(NOTE_NAMES):
+        if name in names:
+            return value
+    raise ValueError("Unknown note %s" % name)
+
+
 def scale_chords(root: int, minor: bool, sevenths=True) -> Dict[str, List[int]]:
     if minor:
         scale = shift(root, MINOR_SCALE)

@@ -1,36 +1,34 @@
 import argparse
 
-from pychord import Chord
-from pychord.utils import note_to_val
 from pyguitar.guitar import Fretboard
-from pyguitar.notes import Namer, shift
+from pyguitar.notes import MAJOR_SCALE, MINOR_SCALE, note_name_to_int, shift
+
+SCALE_NOTE_COLORS = ["red", "black", "green", "black", "blue", "black", "black"]
+SCALE_NOTE_NAMES = ["R", "2", "3", "4", "5", "6", "7"]
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Play with notes")
-    parser.add_argument("command", choices=["chord", "pentatonic"])
-    parser.add_argument("--chord", default="C")
+    parser.add_argument("command", choices=["pentatonic", "triad"])
+    parser.add_argument("--minor", action="store_true")
+    parser.add_argument("--root", default="C")
     options = parser.parse_args()
 
-    board = Fretboard()
-
+    # Determine notes.
+    root = note_name_to_int(options.root)
+    scale = shift(root, MINOR_SCALE if options.minor else MAJOR_SCALE)
     if options.command == "pentatonic":
-        # minor pentatonic
-        root = note_to_val(options.chord)
-        namer = Namer(root)
-        note_colors = ["red", "green", "black", "blue", "black"]
-        note_values = [x % 12 for x in shift(root, (0, 3, 5, 7, 10))]
-        note_names = [namer.name_note(x) for x in note_values]
+        # pentatonic scale
         note_names = ["R", "3", "4", "5", "7"]
     else:
-        # major chord
-        chord = Chord(options.chord)
-        note_colors = ["red", "green", "blue", "black"]
-        note_names = chord.components()
-        note_values = [note_to_val(x) for x in note_names]
+        # major triad
         note_names = ["R", "3", "5"]
+    note_indexes = [SCALE_NOTE_NAMES.index(n) for n in note_names]
+    note_colors = [SCALE_NOTE_COLORS[i] for i in note_indexes]
+    note_values = [scale[i] % 12 for i in note_indexes]
 
-    # place notes on fretboard
+    # Place notes on fretboard.
+    board = Fretboard()
     for pos, note_value in board.walk():
         try:
             idx = note_values.index(note_value % 12)
