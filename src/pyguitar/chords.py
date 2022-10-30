@@ -15,7 +15,11 @@ CHORD_QUALITY_TO_OFFSETS = {
     # triads
     "": (0, 4, 7),
     "m": (0, 3, 7),
+    "aug": (0, 4, 8),
     "dim": (0, 3, 6),
+    # suspended chords
+    "sus2": (0, 2, 7),
+    "sus4": (0, 5, 7),
     # seventh chords
     "7": (0, 4, 7, 10),
     "maj7": (0, 4, 7, 11),
@@ -29,8 +33,9 @@ CHORD_OFFSETS_TO_QUALITY = dict(
 
 def parse_chord_name(name: str, alphabet: str) -> tuple[str, str, str]:
     alphabet_re = "(?:" + ("|".join(alphabet)) + ")[b#]?"
+    quality_re = "|".join(CHORD_QUALITY_TO_OFFSETS.keys())
     chord_re = re.compile(
-        "^(" + alphabet_re + ")(|m|dim|7|maj7|m7|dim7)(?:/(" + alphabet_re + "))?$"
+        "^(" + alphabet_re + ")(" + quality_re + ")(?:/(" + alphabet_re + "))?$"
     )
     m = chord_re.match(name)
     if not m:

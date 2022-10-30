@@ -62,6 +62,9 @@ class ChordsTest(unittest.TestCase):
         chords = {
             # key of C
             ("C", "C"): ["C", "E", "G"],
+            ("Caug", "C"): ["C", "E", "Ab"],  # FIXME : Ab should be G#
+            ("Csus2", "C"): ["C", "D", "G"],
+            ("Csus4", "C"): ["C", "F", "G"],
             ("Dm", "C"): ["D", "F", "A"],
             ("Bdim", "C"): ["B", "D", "F"],
             # key of C#
