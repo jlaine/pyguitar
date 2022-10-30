@@ -8,6 +8,7 @@ from pyguitar.notes import (
     MINOR_SCALE,
     Namer,
     Note,
+    prettify,
     scale_chords,
     shift,
 )
@@ -16,14 +17,20 @@ from pyguitar.notes import (
 def print_scale_chords(root: int, minor: bool, chords: dict[str, list[int]]) -> None:
     namer = Namer(root)
 
-    print("==", namer.name_note(root), "minor" if minor else "major", "key", "==")
+    print(
+        "==",
+        prettify(namer.name_note(root)),
+        "minor" if minor else "major",
+        "key",
+        "==",
+    )
     for num, chord in chords.items():
         print(
             "%-5s %-4s : %s"
             % (
                 num,
-                namer.name_chord(chord),
-                " ".join(["%-2s" % namer.name_note(note) for note in chord]),
+                prettify(namer.name_chord(chord)),
+                " ".join(["%-2s" % prettify(namer.name_note(note)) for note in chord]),
             )
         )
 
@@ -38,8 +45,8 @@ def print_scale_notes(root: int, minor: bool) -> None:
     print(
         "%-8s : %s"
         % (
-            namer.name_scale(scale),
-            " ".join(["%-2s" % namer.name_note(note) for note in scale]),
+            prettify(namer.name_scale(scale)),
+            " ".join(["%-2s" % prettify(namer.name_note(note)) for note in scale]),
         )
     )
 

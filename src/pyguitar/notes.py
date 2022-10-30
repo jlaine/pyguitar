@@ -29,18 +29,18 @@ class Note:
 
 NOTE_ALPHABET = ["C", "D", "E", "F", "G", "A", "B"]
 NOTE_NAMES = (
-    ("C", "B♯"),  # major/minor scale cannot start with B♯
-    ("C♯", "D♭"),  # minor scale cannot start with D♭
+    ("C", "B#"),  # major/minor scale cannot start with B#
+    ("C#", "Db"),  # minor scale cannot start with Db
     ("D",),
-    ("E♭", "D♯"),  # major scale cannot start with D♯
-    ("E", "F♭"),  # major/minor scale cannot start with F♭
-    ("F", "E♯"),  # major/minor scale cannot start with E♯
-    ("F♯", "G♭"),  # minor scale cannot start with G♭
+    ("Eb", "D#"),  # major scale cannot start with D#
+    ("E", "Fb"),  # major/minor scale cannot start with Fb
+    ("F", "E#"),  # major/minor scale cannot start with E#
+    ("F#", "Gb"),  # minor scale cannot start with Gb
     ("G",),
-    ("A♭", "G♯"),  # major scale cannot start with G♯
+    ("Ab", "G#"),  # major scale cannot start with G#
     ("A",),
-    ("B♭", "A♯"),  # major scale cannot start with A♯
-    ("B", "C♭"),  # minor scale cannot start with C♭
+    ("Bb", "A#"),  # major scale cannot start with A#
+    ("B", "Cb"),  # minor scale cannot start with Cb
 )
 
 # scales
@@ -113,11 +113,12 @@ def key_note_names(key: str) -> list[str]:
     """
     Return the list of note names in the given `key`.
     """
-    root_pitch = note_name_to_int(key.upper())
-    minor = key == key.lower()
+    root_name = key[0].upper() + key[1:]
+    root_pitch = note_name_to_int(root_name)
+    minor = key.islower()
     namer = Namer(root_pitch)
     pitches = shift(root_pitch, MINOR_SCALE if minor else MAJOR_SCALE)
-    return [uglify(namer.name_note(p)) for p in pitches]
+    return [namer.name_note(p) for p in pitches]
 
 
 def make_chords(
@@ -142,7 +143,6 @@ def make_chords(
 
 
 def note_name_to_int(name: str) -> int:
-    name = prettify(name)
     for value, names in enumerate(NOTE_NAMES):
         if name in names:
             return value

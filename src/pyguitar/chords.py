@@ -9,6 +9,7 @@ from pyguitar.notes import (
     MINOR_7TH,
     MINOR_TRIAD,
     NOTE_ALPHABET,
+    Namer,
     key_note_names,
     note_name_to_int,
     shift,
@@ -22,14 +23,14 @@ ROMAN_NUMERALS_UPPER = [num.upper() for num in ROMAN_NUMERALS_LOWER]
 def parse_chord_name(name: str, alphabet: str) -> tuple[str, str, str]:
     alphabet_re = "|".join(alphabet)
     chord_re = re.compile(
-        "^(" + alphabet_re + ")(|m|°|dim|7|m7|maj7)(?:/(" + alphabet_re + "))?$"
+        "^(" + alphabet_re + ")(|m|°|dim|7|maj7|m7|dim7)(?:/(" + alphabet_re + "))?$"
     )
     m = chord_re.match(name)
     if not m:
         raise ValueError("Could not parse chord notation %s" % name)
     root = m.group(1)
     quality = m.group(2).replace("°", "dim")
-    assert quality in ("", "m", "dim", "m7", "maj7", "7"), (
+    assert quality in ("", "m", "dim", "7", "m7", "maj7", "dim7"), (
         "Unknown quality %s" % quality
     )
     over = m.group(3)
@@ -45,7 +46,7 @@ def chord_name_from_roman(roman: str, key: str) -> str:
     )
 
     # get root
-    minor = numeral == numeral.lower()
+    minor = numeral.islower()
     chord = note_name_from_roman(numeral, key)
     if minor and quality != "dim":
         chord += "m"
@@ -81,6 +82,15 @@ def chord_name_to_pitches(chord: str) -> list[int]:
     else:
         raise ValueError("Unhandled chord quality '%s'" % quality)
     return pitches
+
+
+def chord_name_to_note_names(chord: str, key: str) -> list[int]:
+    """
+    Return the note names to play the specified `chord`.
+    """
+    pitches = chord_name_to_pitches(chord)
+    namer = Namer(note_name_to_int(key.upper()))
+    return [namer.name_note(p) for p in pitches]
 
 
 def note_name_from_roman(roman: str, key: str) -> str:
