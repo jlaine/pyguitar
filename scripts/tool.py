@@ -1,5 +1,4 @@
 import argparse
-from typing import Dict, List, Tuple
 
 import mido
 
@@ -14,7 +13,7 @@ from pyguitar.notes import (
 )
 
 
-def print_scale_chords(root: int, minor: bool, chords: Dict[str, List[int]]) -> None:
+def print_scale_chords(root: int, minor: bool, chords: dict[str, list[int]]) -> None:
     namer = Namer(root)
 
     print("==", namer.name_note(root), "minor" if minor else "major", "key", "==")
@@ -45,7 +44,7 @@ def print_scale_notes(root: int, minor: bool) -> None:
     )
 
 
-def parse_chord_pattern(root: int, minor: bool, pattern: str) -> List[List[int]]:
+def parse_chord_pattern(root: int, minor: bool, pattern: str) -> list[list[int]]:
     chords = scale_chords(root, minor)
     for bit in ["IV", "V"]:
         if bit not in chords:
@@ -65,7 +64,7 @@ def parse_chord_pattern(root: int, minor: bool, pattern: str) -> List[List[int]]
     return output
 
 
-def parse_strum_pattern(pattern: str, beat_time=480) -> List[List[Tuple[str, int]]]:
+def parse_strum_pattern(pattern: str, beat_time=480) -> list[list[tuple[str, int]]]:
     output = []
     for chunk in pattern.split("/"):
         events = []
@@ -84,7 +83,7 @@ def parse_strum_pattern(pattern: str, beat_time=480) -> List[List[Tuple[str, int
 
 
 def play_midi_chord(
-    *, track: mido.MidiTrack, chord: List[int], strum: List[Tuple[str, int]]
+    *, track: mido.MidiTrack, chord: list[int], strum: list[tuple[str, int]]
 ):
     for event, time in strum:
         track.append(mido.Message(event, note=chord[0], time=time))

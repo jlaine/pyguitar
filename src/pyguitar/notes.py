@@ -1,4 +1,4 @@
-from typing import Dict, List, Sequence, Tuple
+from typing import Sequence
 
 
 class Note:
@@ -100,11 +100,11 @@ class Namer:
         return self.name_note(scale[0]) + " " + t
 
 
-def shift(root: int, pitches: Sequence[int]) -> List[int]:
+def shift(root: int, pitches: Sequence[int]) -> list[int]:
     return [root + x for x in pitches]
 
 
-def unshift(notes: Sequence[int]) -> Tuple[int, List[int]]:
+def unshift(notes: Sequence[int]) -> tuple[int, list[int]]:
     root = notes[0]
     return root, [x - root for x in notes]
 
@@ -122,7 +122,7 @@ def key_note_names(key: str) -> list[str]:
 
 def make_chords(
     scale: Sequence[int], roman: Sequence[str], sevenths: bool
-) -> Dict[str, List[int]]:
+) -> dict[str, list[int]]:
     chords = {}
     for i, bit in enumerate(roman):
         if "°" in bit:
@@ -142,6 +142,7 @@ def make_chords(
 
 
 def note_name_to_int(name: str) -> int:
+    name = prettify(name)
     for value, names in enumerate(NOTE_NAMES):
         if name in names:
             return value
@@ -156,7 +157,7 @@ def uglify(note):
     return note.replace("♭", "b").replace("♯", "#").replace("°", "dim")
 
 
-def scale_chords(root: int, minor: bool, sevenths=True) -> Dict[str, List[int]]:
+def scale_chords(root: int, minor: bool, sevenths=True) -> dict[str, list[int]]:
     if minor:
         scale = shift(root, MINOR_SCALE)
         return make_chords(scale, MINOR_SCALE_ROMAN, sevenths=sevenths)
