@@ -2,73 +2,41 @@ import argparse
 
 import mido
 
+from pyguitar.chords import (
+    chord_name_from_roman,
+    chord_name_to_note_names,
+    chord_name_to_pitches,
+)
 from pyguitar.notes import (
-    MAJOR_SCALE,
-    MAJOR_TRIAD,
-    MINOR_SCALE,
-    Namer,
-    Note,
+    MAJOR_SCALE_ROMAN,
+    MINOR_SCALE_ROMAN,
+    key_note_names,
     prettify,
-    scale_chords,
-    shift,
+    prettify_chord,
+    prettify_key,
 )
 
+MAJOR_KEYS = ["C", "G", "D", "A", "E", "B", "F#", "C#", "Ab", "Eb", "Bb", "F"]
+MINOR_KEYS = [k.lower() for k in MAJOR_KEYS]
 
-def print_scale_chords(root: int, minor: bool, chords: dict[str, list[int]]) -> None:
-    namer = Namer(root)
 
-    print(
-        "==",
-        prettify(namer.name_note(root)),
-        "minor" if minor else "major",
-        "key",
-        "==",
-    )
-    for num, chord in chords.items():
+def print_key_chords(key: str, romans: list[str]) -> None:
+    print("== %s key ==" % prettify_key(key))
+    for chord_roman in romans:
+        chord_name = chord_name_from_roman(chord_roman, key)
         print(
             "%-5s %-4s : %s"
             % (
-                num,
-                prettify(namer.name_chord(chord)),
-                " ".join(["%-2s" % prettify(namer.name_note(note)) for note in chord]),
+                chord_roman,
+                prettify_chord(chord_name),
+                " ".join(
+                    [
+                        "%-2s" % prettify(note)
+                        for note in chord_name_to_note_names(chord_name, key)
+                    ]
+                ),
             )
         )
-
-
-def print_scale_notes(root: int, minor: bool) -> None:
-    namer = Namer(root)
-    if minor:
-        pitches = MINOR_SCALE
-    else:
-        pitches = MAJOR_SCALE
-    scale = shift(root, pitches)
-    print(
-        "%-8s : %s"
-        % (
-            prettify(namer.name_scale(scale)),
-            " ".join(["%-2s" % prettify(namer.name_note(note)) for note in scale]),
-        )
-    )
-
-
-def parse_chord_pattern(root: int, minor: bool, pattern: str) -> list[list[int]]:
-    chords = scale_chords(root, minor)
-    for bit in ["IV", "V"]:
-        if bit not in chords:
-            chords[bit] = shift(chords[bit.lower()][0], MAJOR_TRIAD)
-
-    output = []
-    for bit in pattern.split():
-        if "/" in bit:
-            base_roman, over_roman = bit.split("/")
-        else:
-            base_roman, over_roman = bit, None
-        chord = list(chords[base_roman])
-        if over_roman is not None:
-            over_note = chords[over_roman][0]
-            chord.insert(0, over_note)
-        output.append(chord)
-    return output
 
 
 def parse_strum_pattern(pattern: str, beat_time=480) -> list[list[tuple[str, int]]]:
@@ -90,19 +58,18 @@ def parse_strum_pattern(pattern: str, beat_time=480) -> list[list[tuple[str, int
 
 
 def play_midi_chord(
-    *, track: mido.MidiTrack, chord: list[int], strum: list[tuple[str, int]]
+    *, track: mido.MidiTrack, pitches: list[int], strum: list[tuple[str, int]]
 ):
     for event, time in strum:
-        track.append(mido.Message(event, note=chord[0], time=time))
-        for note in chord[1:]:
+        track.append(mido.Message(event, note=pitches[0], time=time))
+        for note in pitches[1:]:
             track.append(mido.Message(event, note=note, time=0))
 
 
 def play_midi_pattern(
     *,
     track: mido.MidiTrack,
-    root: int,
-    minor: bool,
+    key: str,
     chord_pattern: str,
     strum_pattern: str,
     beats_per_minute=120,
@@ -113,31 +80,27 @@ def play_midi_pattern(
     )
     track.append(mido.Message("program_change", program=26, time=0))
 
-    pattern_chords = parse_chord_pattern(root=root, minor=minor, pattern=chord_pattern)
+    chord_pattern_roman = chord_pattern.split()
+    chord_pattern_name = [chord_name_from_roman(c, key) for c in chord_pattern_roman]
+
     strum_pattern = parse_strum_pattern(pattern=strum_pattern)
     strum_index = 0
     for _ in range(repeat):
-        for chord in pattern_chords:
+        for chord_name in chord_pattern_name:
             play_midi_chord(
                 track=track,
-                chord=chord,
+                pitches=tuple(p + 48 for p in chord_name_to_pitches(chord_name)),
                 strum=strum_pattern[strum_index],
             )
             strum_index = (strum_index + 1) % len(strum_pattern)
 
-    namer = Namer(root)
-
-    # print key
-    used = set(tuple(x) for x in pattern_chords)
-    key_chords = dict(
-        x for x in scale_chords(root, minor).items() if tuple(x[1]) in used
-    )
-    print_scale_chords(root, minor, key_chords)
+    # print chords
+    print_key_chords(key, set(chord_pattern_roman))
 
     print("== pattern ==")
-    print(chord_pattern)
+    print(" ".join(chord_pattern_roman))
     print("== chords ==")
-    print(" ".join(namer.name_chord(x) for x in pattern_chords))
+    print(" ".join(chord_pattern_name))
 
 
 if __name__ == "__main__":
@@ -149,51 +112,47 @@ if __name__ == "__main__":
     options = parser.parse_args()
 
     if options.command == "chords":
-        for root in [
-            Note.C3,
-            Note.G3,
-            Note.D3,
-            Note.A3,
-            Note.E3,
-            Note.B3,
-            Note.G3 - 1,
-            Note.D3 - 1,
-            Note.A3 - 1,
-            Note.E3 - 1,
-            Note.B3 - 1,
-            Note.F3,
-        ]:
-            chords = scale_chords(root, minor=options.minor, sevenths=False)
-            print_scale_chords(root, minor=options.minor, chords=chords)
+        for key in MINOR_KEYS if options.minor else MAJOR_KEYS:
+            print_key_chords(
+                key, MINOR_SCALE_ROMAN if key.islower() else MAJOR_SCALE_ROMAN
+            )
     elif options.command == "notes":
-        for root in range(Note.C3, Note.C4):
-            print_scale_notes(root, minor=options.minor)
+        for key in MINOR_KEYS if options.minor else MAJOR_KEYS:
+            print(
+                "%-8s : %s"
+                % (
+                    prettify_key(key),
+                    " ".join(["%-2s" % prettify(name) for name in key_note_names(key)]),
+                )
+            )
     else:
         songs = {
             "50s": {
                 "chord_pattern": "I vi IV V",
+                "key": "C",
             },
             "blueforyou": {
                 "beats_per_minute": 90,
                 "chord_pattern": "I7 IV7 I7 I7 " + "IV7 IV7 I7 I7 " + "V7 IV7 I7 V7",
-                "root": Note.D4,
+                "key": "D",
                 "strum_pattern": "D-D-D-D-",
             },
             "blues": {
                 "chord_pattern": "I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 V7",
-                "root": Note.A3,
+                "key": "A",
             },
             "blues-quick-change": {
                 "chord_pattern": "I7 IV7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 V7",
-                "root": Note.A3,
+                "key": "A",
             },
             "blues-slow-change": {
                 "chord_pattern": "I7 I7 I7 I7 IV7 IV7 I7 I7 V7 V7 I7 I7",
-                "root": Note.A3,
+                "key": "A",
             },
             "blues7": {
                 "beats_per_minute": 130,
                 "chord_pattern": "I IV I I7 IV IV7 I I7 V IV I V7",
+                "key": "A",
                 "strum_pattern": "D-DU-UD-/D-DU-UDU",
             },
             "heyjude": {
@@ -202,19 +161,21 @@ if __name__ == "__main__":
                     "I I V V V7 V7 I I IV IV I I V V7 I I "  # verse
                     + "I7 I7 IV IVmaj7/iii ii7 IV/I V7 V7 I I"  # chorus
                 ),
-                "root": Note.F3,
+                "key": "F",
                 "strum_pattern": "D-D-D-DU",
             },
             "key": {
-                "chord_pattern": "I ii iii IV V vi vii°",
+                "chord_pattern": "I ii iii IV V vi viidim",
+                "key": "A",
             },
             "paintitblack": {
                 "beats_per_minute": 160,
                 "chord_pattern": "i VII III VII i i i i i VII III VII IV IV V/iv V/iv",
-                "root": Note.E3,
+                "key": "e",
                 "strum_pattern": "D-DU/DUD/U-UD/U-UD-",
             },
             "pop": {
+                "key": "C",
                 "pattern": "I V vi IV",
             },
         }
@@ -227,8 +188,7 @@ if __name__ == "__main__":
 
         play_midi_pattern(
             track=track,
-            root=song.get("root", Note.C3),
-            minor=song["chord_pattern"].startswith("i"),
+            key=song["key"],
             chord_pattern=song["chord_pattern"],
             strum_pattern=song.get("strum_pattern", "D-D-D-D-"),
             beats_per_minute=song.get("beats_per_minute", 120),
