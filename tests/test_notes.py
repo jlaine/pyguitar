@@ -3,7 +3,7 @@ import unittest
 from pyguitar.notes import (
     key_note_names,
     note_name_from_roman,
-    note_name_to_int,
+    note_name_to_pitch,
     prettify,
     prettify_chord,
     prettify_key,
@@ -41,7 +41,7 @@ class NotesTest(unittest.TestCase):
             with self.subTest(roman=roman):
                 self.assertEqual(note_name_from_roman(roman, "C"), name)
 
-    def test_note_name_to_int(self):
+    def test_note_name_to_pitch(self):
         notes = {
             "C": 0,
             "Db": 1,
@@ -57,10 +57,10 @@ class NotesTest(unittest.TestCase):
         }
         for name, pitch in notes.items():
             with self.subTest(name=name):
-                self.assertEqual(note_name_to_int(name), pitch)
+                self.assertEqual(note_name_to_pitch(name), pitch)
 
         with self.assertRaises(ValueError):
-            note_name_to_int("X")
+            note_name_to_pitch("X")
 
     def test_prettify(self):
         notes = {

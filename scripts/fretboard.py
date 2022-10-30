@@ -1,7 +1,7 @@
 import argparse
 
 from pyguitar.guitar import Fretboard
-from pyguitar.notes import MAJOR_SCALE, MINOR_SCALE, note_name_to_int, shift
+from pyguitar.notes import MAJOR_SCALE, MINOR_SCALE, note_name_to_pitch, shift
 
 SCALE_NOTE_COLORS = ["red", "black", "green", "black", "blue", "black", "black"]
 SCALE_NOTE_NAMES = ["R", "2", "3", "4", "5", "6", "7"]
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     options = parser.parse_args()
 
     # Determine notes.
-    root = note_name_to_int(options.root)
+    root = note_name_to_pitch(options.root)
     scale = shift(root, MINOR_SCALE if options.minor else MAJOR_SCALE)
     if options.command == "pentatonic":
         # pentatonic scale

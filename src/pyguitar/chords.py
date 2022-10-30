@@ -3,10 +3,9 @@ import re
 from pyguitar.notes import (
     NOTE_ALPHABET,
     ROMAN_ALPHABET,
-    Namer,
-    key_root_name,
+    note_name_from_pitch,
     note_name_from_roman,
-    note_name_to_int,
+    note_name_to_pitch,
     shift,
     unshift,
 )
@@ -50,20 +49,24 @@ def chord_name_from_pitches(pitches: list[int], key: str) -> str:
     """
     Return a chord name for the given `pitches` in the specified `key`.
     """
-    namer = Namer(note_name_to_int(key_root_name(key)))
     try:
         root, offsets = unshift(pitches)
         quality = CHORD_OFFSETS_TO_QUALITY[tuple(offsets)]
-        return namer.name_note(root) + quality
+        return note_name_from_pitch(root, key) + quality
     except KeyError:
         root, offsets = unshift(pitches[1:])
         quality = CHORD_OFFSETS_TO_QUALITY[tuple(offsets)]
-        return namer.name_note(root) + quality + "/" + namer.name_note(pitches[0])
+        return (
+            note_name_from_pitch(root, key)
+            + quality
+            + "/"
+            + note_name_from_pitch(pitches[0], key)
+        )
 
 
 def chord_name_from_roman(roman: str, key: str) -> str:
     """
-    Convert a `roman` chord notation to a chord name in the specified `key`.
+    Return a chord name for the given `roman` chord notation in the specified `key`.
     """
     numeral, quality, over = parse_chord_name(roman, ROMAN_ALPHABET)
 
@@ -86,11 +89,11 @@ def chord_name_to_pitches(chord: str) -> list[int]:
     Return the pitches to play the specified `chord`.
     """
     root_name, quality, over = parse_chord_name(chord, NOTE_ALPHABET)
-    root_pitch = note_name_to_int(root_name)
+    root_pitch = note_name_to_pitch(root_name)
 
     pitches = shift(root_pitch, CHORD_QUALITY_TO_OFFSETS[quality])
     if over:
-        pitches.insert(0, note_name_to_int(over))
+        pitches.insert(0, note_name_to_pitch(over))
 
     return pitches
 
@@ -100,5 +103,4 @@ def chord_name_to_note_names(chord: str, key: str) -> list[int]:
     Return the note names to play the specified `chord`.
     """
     pitches = chord_name_to_pitches(chord)
-    namer = Namer(note_name_to_int(key_root_name(key)))
-    return [namer.name_note(p) for p in pitches]
+    return [note_name_from_pitch(p, key) for p in pitches]

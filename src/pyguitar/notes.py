@@ -86,31 +86,41 @@ def key_note_names(key: str) -> list[str]:
     Return the list of note names in the given `key`.
     """
     root_name = key_root_name(key)
-    root_pitch = note_name_to_int(root_name)
+    root_pitch = note_name_to_pitch(root_name)
     minor = key.islower()
-    namer = Namer(root_pitch)
     pitches = shift(root_pitch, MINOR_SCALE if minor else MAJOR_SCALE)
-    return [namer.name_note(p) for p in pitches]
+    return [note_name_from_pitch(p, key) for p in pitches]
 
 
 def key_root_name(key: str) -> str:
     return key[0].upper() + key[1:]
 
 
+def note_name_from_pitch(pitch: int, key: str) -> str:
+    """
+    Return the note name for the given `pitch` in the specified `key`.
+    """
+    namer = Namer(note_name_to_pitch(key_root_name(key)))
+    return namer.name_note(pitch)
+
+
 def note_name_from_roman(roman: str, key: str) -> str:
     """
-    Convert a `roman` numeral to a note in the specifiied `key`.
+    Return the note name for the given `roman` numeral in the specified `key`.
     """
     index = ROMAN_NUMERALS_LOWER.index(roman.lower())
     notes = key_note_names(key)
     return notes[index]
 
 
-def note_name_to_int(name: str) -> int:
+def note_name_to_pitch(note: str) -> int:
+    """
+    Return the pitch to play the specified `note`.
+    """
     for value, names in enumerate(NOTE_NAMES):
-        if name in names:
+        if note in names:
             return value
-    raise ValueError("Unknown note %s" % name)
+    raise ValueError("Unknown note %s" % note)
 
 
 def prettify(note: str) -> str:
