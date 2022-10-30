@@ -1,3 +1,4 @@
+import functools
 from typing import Sequence
 
 
@@ -42,6 +43,8 @@ NOTE_NAMES = (
     ("Bb", "A#"),  # major scale cannot start with A#
     ("B", "Cb"),  # minor scale cannot start with Cb
 )
+NOTE_NAMES_SHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+NOTE_NAMES_FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
 
 # Roman numerals.
 ROMAN_NUMERALS_LOWER = ["i", "ii", "iii", "iv", "v", "vi", "vii"]
@@ -53,23 +56,34 @@ MAJOR_SCALE = (0, 2, 4, 5, 7, 9, 11)
 MAJOR_SCALE_ROMAN = ("I", "ii", "iii", "IV", "V", "vi", "viidim")
 MINOR_SCALE = (0, 2, 3, 5, 7, 8, 10)
 MINOR_SCALE_ROMAN = ("i", "iidim", "III", "iv", "v", "VI", "VII")
-SCALE_NAMES = {
-    tuple(MAJOR_SCALE): "major",
-    tuple(MINOR_SCALE): "minor",
-}
 
-
-class Namer:
-    def __init__(self, root: int) -> None:
-        self._note_names = {}
-        for pitches in [MAJOR_SCALE, MINOR_SCALE]:
-            scale = shift(root, pitches)
-            names = scale_note_names(scale)
-            for i, note in enumerate(scale):
-                self._note_names[note % 12] = names[i]
-
-    def name_note(self, note: int) -> str:
-        return self._note_names[note % 12]
+# Circle of fifths.
+KEYS = [
+    ("Cb", None),
+    ("Gb", "eb"),
+    ("Db", "bb"),
+    ("Ab", "f"),
+    ("Eb", "c"),
+    ("Bb", "g"),
+    ("F", "d"),
+    ("C", "a"),
+    ("G", "e"),
+    ("D", "b"),
+    ("A", "f#"),
+    ("E", "c#"),
+    ("B", "g#"),
+    ("F#", "d#"),
+    ("C#", None),
+]
+KEY_INDEXES = [(f + 7) % len(KEYS) for f in range(len(KEYS))]
+KEY_SIGNATURES = {}
+MAJOR_KEYS = [KEYS[i][0] for i in KEY_INDEXES if KEYS[i][0] is not None]
+MINOR_KEYS = [KEYS[i][1] for i in KEY_INDEXES if KEYS[i][1] is not None]
+for idx, (major, minor) in enumerate(KEYS):
+    if major is not None:
+        KEY_SIGNATURES[major] = idx - 7
+    if minor is not None:
+        KEY_SIGNATURES[minor] = idx - 7
 
 
 def shift(root: int, pitches: Sequence[int]) -> list[int]:
@@ -79,6 +93,38 @@ def shift(root: int, pitches: Sequence[int]) -> list[int]:
 def unshift(notes: Sequence[int]) -> tuple[int, list[int]]:
     root = notes[0]
     return root, [x - root for x in notes]
+
+
+@functools.lru_cache()
+def build_note_names(key: str) -> list[str]:
+    root_name = key_root_name(key)
+    root_pitch = note_name_to_pitch(root_name)
+    note_index = NOTE_ALPHABET.index(root_name[0])
+    offsets = MINOR_SCALE if key.islower() else MAJOR_SCALE
+
+    # Name notes in the key.
+    all_note_names = 12 * [None]
+    all_note_names[root_pitch % 12] = root_name
+    for offset in offsets[1:]:
+        note = root_pitch + offset
+        note_index = (note_index + 1) % 7
+        for name in NOTE_NAMES[note % 12]:
+            if name[0] == NOTE_ALPHABET[note_index]:
+                all_note_names[note % 12] = name
+                break
+        else:
+            raise ValueError("Scale cannot start with %s" % root_name)
+
+    # Fill the gaps.
+    if KEY_SIGNATURES[key] < 0:
+        note_alphabet = NOTE_NAMES_FLAT
+    else:
+        note_alphabet = NOTE_NAMES_SHARP
+    for note, val in enumerate(all_note_names):
+        if val is None:
+            all_note_names[note] = note_alphabet[note]
+
+    return all_note_names
 
 
 def key_note_names(key: str) -> list[str]:
@@ -100,8 +146,8 @@ def note_name_from_pitch(pitch: int, key: str) -> str:
     """
     Return the note name for the given `pitch` in the specified `key`.
     """
-    namer = Namer(note_name_to_pitch(key_root_name(key)))
-    return namer.name_note(pitch)
+    note_names = build_note_names(key)
+    return note_names[pitch % 12]
 
 
 def note_name_from_roman(roman: str, key: str) -> str:
@@ -134,19 +180,3 @@ def prettify_chord(chord: str) -> str:
 def prettify_key(key: str) -> str:
     kind = "minor" if key.islower() else "major"
     return prettify(key_root_name(key)) + " " + kind
-
-
-def scale_note_names(scale):
-    root_name = NOTE_NAMES[scale[0] % 12][0]
-    note_index = NOTE_ALPHABET.index(root_name[0])
-
-    note_names = [root_name]
-    for note in scale[1:]:
-        note_index = (note_index + 1) % 7
-        for name in NOTE_NAMES[note % 12]:
-            if name[0] == NOTE_ALPHABET[note_index]:
-                note_names.append(name)
-                break
-    if len(note_names) != len(scale):
-        raise ValueError("Scale cannot start with %s" % root_name)
-    return note_names

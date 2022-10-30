@@ -62,7 +62,7 @@ class ChordsTest(unittest.TestCase):
         chords = {
             # key of C
             ("C", "C"): ["C", "E", "G"],
-            ("Caug", "C"): ["C", "E", "Ab"],  # FIXME : Ab should be G#
+            ("Caug", "C"): ["C", "E", "G#"],
             ("Csus2", "C"): ["C", "D", "G"],
             ("Csus4", "C"): ["C", "F", "G"],
             ("Dm", "C"): ["D", "F", "A"],
@@ -87,7 +87,8 @@ class ChordsTest(unittest.TestCase):
             "Cm7": [0, 3, 7, 10],
             "Cdim7": [0, 3, 6, 9],
         }
+        key = "C"
         for name, pitches in chords.items():
-            with self.subTest(chord=name):
+            with self.subTest(name=name, key=key):
                 self.assertEqual(chord_name_to_pitches(name), pitches)
-                self.assertEqual(chord_name_from_pitches(pitches, "C"), name)
+                self.assertEqual(chord_name_from_pitches(pitches, key), name)

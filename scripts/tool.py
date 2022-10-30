@@ -8,16 +8,15 @@ from pyguitar.chords import (
     chord_name_to_pitches,
 )
 from pyguitar.notes import (
+    MAJOR_KEYS,
     MAJOR_SCALE_ROMAN,
+    MINOR_KEYS,
     MINOR_SCALE_ROMAN,
     key_note_names,
     prettify,
     prettify_chord,
     prettify_key,
 )
-
-MAJOR_KEYS = ["C", "G", "D", "A", "E", "B", "F#", "C#", "Ab", "Eb", "Bb", "F"]
-MINOR_KEYS = [k.lower() for k in MAJOR_KEYS]
 
 
 def print_key_chords(key: str, romans: list[str]) -> None:
