@@ -1,5 +1,6 @@
 import argparse
 import dataclasses
+from fractions import Fraction
 from typing import Iterable
 
 import mido
@@ -19,6 +20,7 @@ from pyguitar.notes import (
     prettify_key,
     prettify_note,
 )
+from pyguitar.tracks import Track
 
 
 @dataclasses.dataclass
@@ -48,68 +50,47 @@ def print_key_chords(key: str, romans: Iterable[str]) -> None:
         )
 
 
-def parse_strum_pattern(pattern: str, beat_time=480) -> list[list[tuple[str, int]]]:
-    output = []
-    for chunk in pattern.split("/"):
-        events = []
-        assert chunk[0] in ("D", "U"), "strum pattern chunk must start with a strum"
-        for strum in chunk:
-            if strum in ("D", "U"):
-                events += [
-                    ("note_on", 0),
-                    ("note_off", int(beat_time / 2)),
-                ]
-            else:
-                assert strum == "-"
-                events[-1] = (events[-1][0], events[-1][1] + int(beat_time / 2))
-        output.append(events)
-    return output
-
-
-def play_midi_chord(
-    *, track: mido.MidiTrack, pitches: list[int], strum: list[tuple[str, int]]
-) -> None:
-    for event, time in strum:
-        track.append(mido.Message(event, note=pitches[0], time=time))
-        for note in pitches[1:]:
-            track.append(mido.Message(event, note=note, time=0))
-
-
-def play_midi_pattern(
-    *,
-    track: mido.MidiTrack,
+def strum_pattern(
     key: str,
     chord_pattern: str,
     strum_pattern: str,
     beats_per_minute=120,
     repeat=1,
-) -> None:
-    track.append(
-        mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(beats_per_minute), time=0)
-    )
-    track.append(mido.Message("program_change", program=26, time=0))
+):
+    track = Track(beats_per_minute=beats_per_minute)
 
     chord_pattern_roman = chord_pattern.split()
     chord_pattern_name = [chord_name_from_roman(c, key) for c in chord_pattern_roman]
 
-    strum_events = parse_strum_pattern(pattern=strum_pattern)
+    half_beat = Fraction(1, 2)
+    strum_events: list[list[Fraction]] = []
+    for chunk in strum_pattern.split("/"):
+        events = []
+        assert chunk[0] in ("D", "U"), "strum pattern chunk must start with a strum"
+        for strum in chunk:
+            if strum in ("D", "U"):
+                events.append(half_beat)
+            else:
+                assert strum == "-"
+                events[-1] += half_beat
+        strum_events.append(events)
+
     strum_index = 0
     for _ in range(repeat):
         for chord_name in chord_pattern_name:
-            play_midi_chord(
-                track=track,
-                pitches=[p + 48 for p in chord_name_to_pitches(chord_name)],
-                strum=strum_events[strum_index],
-            )
+            pitches = [p + 48 for p in chord_name_to_pitches(chord_name)]
+            for duration in strum_events[strum_index]:
+                track.add_notes(duration=duration, pitches=pitches)
             strum_index = (strum_index + 1) % len(strum_events)
 
     # print chords
     print_key_chords(key, set(chord_pattern_roman))
-
     print("== pattern ==")
     print(" ".join(chord_pattern_roman))
     print("== chords ==")
     print(" ".join(chord_pattern_name))
+
+    return track
 
 
 if __name__ == "__main__":
@@ -194,12 +175,7 @@ if __name__ == "__main__":
         assert options.song in songs, "Please specify a song with --song"
         song = songs[options.song]
 
-        mid = mido.MidiFile()
-        track = mido.MidiTrack()
-        mid.tracks.append(track)
-
-        play_midi_pattern(
-            track=track,
+        track = strum_pattern(
             key=song.key,
             chord_pattern=song.chord_pattern,
             strum_pattern=song.strum_pattern,
@@ -207,4 +183,7 @@ if __name__ == "__main__":
             repeat=options.repeat,
         )
 
-        mid.save(options.song + ".mid")
+        # Save to MIDI file.
+        mid_file = mido.MidiFile()
+        mid_file.tracks.append(track.to_midi())
+        mid_file.save(options.song + ".mid")
