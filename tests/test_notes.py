@@ -1,18 +1,18 @@
 import unittest
 
 from pyguitar.notes import (
-    key_note_names,
+    key_name_to_note_names,
     note_name_from_pitch,
     note_name_from_roman,
     note_name_to_pitch,
-    prettify,
     prettify_chord,
     prettify_key,
+    prettify_note,
 )
 
 
 class NotesTest(unittest.TestCase):
-    def test_key_note_names(self):
+    def test_key_name_to_note_names(self):
         keys = {
             # Major scales.
             "Cb": ["Cb", "Db", "Eb", "Fb", "Gb", "Ab", "Bb"],
@@ -47,11 +47,11 @@ class NotesTest(unittest.TestCase):
         }
         for key, names in keys.items():
             with self.subTest(key=key):
-                self.assertEqual(key_note_names(key), names)
+                self.assertEqual(key_name_to_note_names(key), names)
 
         # Invalid scale.
         with self.assertRaises(ValueError) as cm:
-            key_note_names("B#")
+            key_name_to_note_names("B#")
         self.assertEqual(str(cm.exception), "Scale cannot start with B#")
 
     def test_note_name_from_roman(self):
@@ -91,16 +91,6 @@ class NotesTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             note_name_to_pitch("X")
 
-    def test_prettify(self):
-        notes = {
-            "C": "C",
-            "Cb": "C♭",
-            "C#": "C♯",
-        }
-        for plain, pretty in notes.items():
-            with self.subTest(plain=plain):
-                self.assertEqual(prettify(plain), pretty)
-
     def test_prettify_chord(self):
         notes = {
             "C": "C",
@@ -126,3 +116,13 @@ class NotesTest(unittest.TestCase):
         for plain, pretty in notes.items():
             with self.subTest(plain=plain):
                 self.assertEqual(prettify_key(plain), pretty)
+
+    def test_prettify_note(self):
+        notes = {
+            "C": "C",
+            "Cb": "C♭",
+            "C#": "C♯",
+        }
+        for plain, pretty in notes.items():
+            with self.subTest(plain=plain):
+                self.assertEqual(prettify_note(plain), pretty)

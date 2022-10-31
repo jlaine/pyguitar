@@ -12,10 +12,10 @@ from pyguitar.notes import (
     MAJOR_SCALE_ROMAN,
     MINOR_KEYS,
     MINOR_SCALE_ROMAN,
-    key_note_names,
-    prettify,
+    key_name_to_note_names,
     prettify_chord,
     prettify_key,
+    prettify_note,
 )
 
 
@@ -30,7 +30,7 @@ def print_key_chords(key: str, romans: list[str]) -> None:
                 prettify_chord(chord_name),
                 " ".join(
                     [
-                        "%-2s" % prettify(note)
+                        "%-2s" % prettify_note(note)
                         for note in chord_name_to_note_names(chord_name, key)
                     ]
                 ),
@@ -121,7 +121,12 @@ if __name__ == "__main__":
                 "%-8s : %s"
                 % (
                     prettify_key(key),
-                    " ".join(["%-2s" % prettify(name) for name in key_note_names(key)]),
+                    " ".join(
+                        [
+                            "%-2s" % prettify_note(name)
+                            for name in key_name_to_note_names(key)
+                        ]
+                    ),
                 )
             )
     else:

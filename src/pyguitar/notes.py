@@ -103,7 +103,7 @@ def build_note_names(key: str) -> list[str]:
     offsets = MINOR_SCALE if key.islower() else MAJOR_SCALE
 
     # Name notes in the key.
-    all_note_names = 12 * [None]
+    all_note_names = 12 * [""]
     all_note_names[root_pitch % 12] = root_name
     for offset in offsets[1:]:
         note = root_pitch + offset
@@ -121,21 +121,27 @@ def build_note_names(key: str) -> list[str]:
     else:
         note_alphabet = NOTE_NAMES_SHARP
     for note, val in enumerate(all_note_names):
-        if val is None:
+        if not val:
             all_note_names[note] = note_alphabet[note]
 
     return all_note_names
 
 
-def key_note_names(key: str) -> list[str]:
+def key_name_to_note_names(key: str) -> list[str]:
     """
     Return the list of note names in the given `key`.
+    """
+    return [note_name_from_pitch(p, key) for p in key_name_to_pitches(key)]
+
+
+def key_name_to_pitches(key: str) -> list[int]:
+    """
+    Return the list of pitches in the given `key`.
     """
     root_name = key_root_name(key)
     root_pitch = note_name_to_pitch(root_name)
     minor = key.islower()
-    pitches = shift(root_pitch, MINOR_SCALE if minor else MAJOR_SCALE)
-    return [note_name_from_pitch(p, key) for p in pitches]
+    return shift(root_pitch, MINOR_SCALE if minor else MAJOR_SCALE)
 
 
 def key_root_name(key: str) -> str:
@@ -155,7 +161,7 @@ def note_name_from_roman(roman: str, key: str) -> str:
     Return the note name for the given `roman` numeral in the specified `key`.
     """
     index = ROMAN_NUMERALS_LOWER.index(roman.lower())
-    notes = key_note_names(key)
+    notes = key_name_to_note_names(key)
     return notes[index]
 
 
@@ -169,14 +175,14 @@ def note_name_to_pitch(note: str) -> int:
     raise ValueError("Unknown note %s" % note)
 
 
-def prettify(note: str) -> str:
-    return note.replace("b", "♭").replace("#", "♯")
-
-
 def prettify_chord(chord: str) -> str:
-    return prettify(chord).replace("dim", "°")
+    return prettify_note(chord).replace("dim", "°")
 
 
 def prettify_key(key: str) -> str:
     kind = "minor" if key.islower() else "major"
-    return prettify(key_root_name(key)) + " " + kind
+    return prettify_note(key_root_name(key)) + " " + kind
+
+
+def prettify_note(note: str) -> str:
+    return note.replace("b", "♭").replace("#", "♯")

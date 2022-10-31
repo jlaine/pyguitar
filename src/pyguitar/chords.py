@@ -30,7 +30,7 @@ CHORD_OFFSETS_TO_QUALITY = dict(
 )
 
 
-def parse_chord_name(name: str, alphabet: str) -> tuple[str, str, str]:
+def parse_chord_name(name: str, alphabet: list[str]) -> tuple[str, str, str]:
     alphabet_re = "(?:" + ("|".join(alphabet)) + ")[b#]?"
     quality_re = "|".join(CHORD_QUALITY_TO_OFFSETS.keys())
     chord_re = re.compile(
@@ -98,7 +98,7 @@ def chord_name_to_pitches(chord: str) -> list[int]:
     return pitches
 
 
-def chord_name_to_note_names(chord: str, key: str) -> list[int]:
+def chord_name_to_note_names(chord: str, key: str) -> list[str]:
     """
     Return the note names to play the specified `chord`.
     """
