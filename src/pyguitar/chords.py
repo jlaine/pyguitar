@@ -24,6 +24,11 @@ CHORD_QUALITY_TO_OFFSETS = {
     "maj7": (0, 4, 7, 11),
     "m7": (0, 3, 7, 10),
     "dim7": (0, 3, 6, 9),
+    # ninth chords
+    "9": (0, 4, 7, 10, 14),  # dominant ninth
+    "maj9": (0, 4, 7, 11, 14),  # major ninth
+    "m9": (0, 3, 7, 10, 14),  # minor ninth
+    "7b9": (0, 4, 7, 10, 13),  # dominant minor ninth
 }
 CHORD_OFFSETS_TO_QUALITY = dict(
     (tuple(v), k) for (k, v) in CHORD_QUALITY_TO_OFFSETS.items()
