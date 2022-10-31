@@ -38,6 +38,8 @@ setuptools.setup(
             "coverage",
             "flake8",
             "isort",
+            "mypy",
+            "types-colorama",
         ]
     },
 )

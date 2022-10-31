@@ -1,3 +1,6 @@
+import dataclasses
+from typing import Iterator, Optional
+
 from colorama import Back, Fore, Style
 
 from pyguitar.notes import Note
@@ -6,12 +9,20 @@ FRETS = 15
 STRINGS = [Note.E2, Note.A2, Note.D3, Note.G3, Note.B3, Note.E4]
 
 
-class Fretboard:
-    def __init__(self):
-        self._cells = [[None for x in STRINGS] for f in range(FRETS)]
+@dataclasses.dataclass
+class Cell:
+    color: str
+    text: str
 
-    def dump(self):
-        def pad(i):
+
+class Fretboard:
+    def __init__(self) -> None:
+        self._cells: list[list[Optional[Cell]]] = [
+            [None for x in STRINGS] for f in range(FRETS)
+        ]
+
+    def dump(self) -> str:
+        def pad(i: str) -> str:
             if len(i) == 1:
                 return " " + i + " "
             elif len(i) == 2:
@@ -23,16 +34,16 @@ class Fretboard:
         lines = []
         width = 5 * len(STRINGS) - 2
         for idx, row in enumerate(self._cells):
-            row = [
+            str_row: list[str] = [
                 (
-                    (getattr(Fore, x["color"].upper()) + pad(x["text"]) + Fore.BLACK)
-                    if x
+                    (getattr(Fore, cell.color.upper()) + pad(cell.text) + Fore.BLACK)
+                    if cell is not None
                     else (Fore.BLACK + pad("|") + Fore.RESET)
                 )
-                for x in row
+                for cell in row
             ]
             lines.append(
-                ("%.2d " % idx) + Back.WHITE + "  ".join(row) + Style.RESET_ALL
+                ("%.2d " % idx) + Back.WHITE + "  ".join(str_row) + Style.RESET_ALL
             )
             marker = "-" if idx else "="
             lines.append(
@@ -40,7 +51,7 @@ class Fretboard:
             )
         return "\n".join(lines)
 
-    def dump_svg(self):
+    def dump_svg(self) -> str:
         padding = 10
         fret_spacing = 30
         string_spacing = 20
@@ -74,7 +85,7 @@ class Fretboard:
         # draw markers
         for fret_idx, row in enumerate(self._cells):
             for string_idx, cell in enumerate(row):
-                if cell:
+                if cell is not None:
                     cx = padding + string_idx * string_spacing
                     cy = padding + (fret_idx + 0.5) * fret_spacing
                     output += (
@@ -83,21 +94,21 @@ class Fretboard:
                             cx,
                             cy,
                             string_spacing / 2.5,
-                            cell["color"],
+                            cell.color,
                         )
                     )
                     output += (
                         '<text x="%f" y="%f" fill="%s" font-family="arial" font-size="12px" text-anchor="middle">%s</text>'
-                        % (cx, cy + 4, cell["color"], cell["text"])
+                        % (cx, cy + 4, cell.color, cell.text)
                     )
 
         output += "</svg>"
         return output
 
-    def set(self, pos, value):
+    def set(self, pos: tuple[int, int], value: Optional[Cell]) -> None:
         self._cells[pos[0]][pos[1]] = value
 
-    def walk(self):
+    def walk(self) -> Iterator[tuple[tuple[int, int], int]]:
         for string_idx, string_note in enumerate(STRINGS):
             for fret in range(FRETS):
                 yield (fret, string_idx), string_note + fret

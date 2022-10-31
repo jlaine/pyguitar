@@ -1,6 +1,6 @@
 import argparse
 
-from pyguitar.guitar import Fretboard
+from pyguitar.guitar import Cell, Fretboard
 from pyguitar.notes import key_name_to_pitches
 
 SCALE_NOTE_COLORS = ["red", "black", "green", "black", "blue", "black", "black"]
@@ -32,7 +32,7 @@ if __name__ == "__main__":
             idx = note_values.index(note_value % 12)
         except ValueError:
             continue
-        board.set(pos, {"color": note_colors[idx], "text": note_names[idx]})
+        board.set(pos, Cell(color=note_colors[idx], text=note_names[idx]))
 
     # display fretboard
     print(board.dump())

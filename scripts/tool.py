@@ -1,4 +1,6 @@
 import argparse
+import dataclasses
+from typing import Iterable
 
 import mido
 
@@ -19,7 +21,15 @@ from pyguitar.notes import (
 )
 
 
-def print_key_chords(key: str, romans: list[str]) -> None:
+@dataclasses.dataclass
+class Song:
+    chord_pattern: str
+    key: str
+    beats_per_minute: int = 120
+    strum_pattern: str = "D-D-D-D-"
+
+
+def print_key_chords(key: str, romans: Iterable[str]) -> None:
     print("== %s key ==" % prettify_key(key))
     for chord_roman in romans:
         chord_name = chord_name_from_roman(chord_roman, key)
@@ -58,7 +68,7 @@ def parse_strum_pattern(pattern: str, beat_time=480) -> list[list[tuple[str, int
 
 def play_midi_chord(
     *, track: mido.MidiTrack, pitches: list[int], strum: list[tuple[str, int]]
-):
+) -> None:
     for event, time in strum:
         track.append(mido.Message(event, note=pitches[0], time=time))
         for note in pitches[1:]:
@@ -73,7 +83,7 @@ def play_midi_pattern(
     strum_pattern: str,
     beats_per_minute=120,
     repeat=1,
-):
+) -> None:
     track.append(
         mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(beats_per_minute), time=0)
     )
@@ -82,16 +92,16 @@ def play_midi_pattern(
     chord_pattern_roman = chord_pattern.split()
     chord_pattern_name = [chord_name_from_roman(c, key) for c in chord_pattern_roman]
 
-    strum_pattern = parse_strum_pattern(pattern=strum_pattern)
+    strum_events = parse_strum_pattern(pattern=strum_pattern)
     strum_index = 0
     for _ in range(repeat):
         for chord_name in chord_pattern_name:
             play_midi_chord(
                 track=track,
-                pitches=tuple(p + 48 for p in chord_name_to_pitches(chord_name)),
-                strum=strum_pattern[strum_index],
+                pitches=[p + 48 for p in chord_name_to_pitches(chord_name)],
+                strum=strum_events[strum_index],
             )
-            strum_index = (strum_index + 1) % len(strum_pattern)
+            strum_index = (strum_index + 1) % len(strum_events)
 
     # print chords
     print_key_chords(key, set(chord_pattern_roman))
@@ -131,57 +141,55 @@ if __name__ == "__main__":
             )
     else:
         songs = {
-            "50s": {
-                "chord_pattern": "I vi IV V",
-                "key": "C",
-            },
-            "blueforyou": {
-                "beats_per_minute": 90,
-                "chord_pattern": "I7 IV7 I7 I7 " + "IV7 IV7 I7 I7 " + "V7 IV7 I7 V7",
-                "key": "D",
-                "strum_pattern": "D-D-D-D-",
-            },
-            "blues": {
-                "chord_pattern": "I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 V7",
-                "key": "A",
-            },
-            "blues-quick-change": {
-                "chord_pattern": "I7 IV7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 V7",
-                "key": "A",
-            },
-            "blues-slow-change": {
-                "chord_pattern": "I7 I7 I7 I7 IV7 IV7 I7 I7 V7 V7 I7 I7",
-                "key": "A",
-            },
-            "blues7": {
-                "beats_per_minute": 130,
-                "chord_pattern": "I IV I I7 IV IV7 I I7 V IV I V7",
-                "key": "A",
-                "strum_pattern": "D-DU-UD-/D-DU-UDU",
-            },
-            "heyjude": {
-                "beats_per_minute": 150,
-                "chord_pattern": (
+            "50s": Song(
+                chord_pattern="I vi IV V",
+                key="C",
+            ),
+            "blueforyou": Song(
+                beats_per_minute=90,
+                chord_pattern="I7 IV7 I7 I7 " + "IV7 IV7 I7 I7 " + "V7 IV7 I7 V7",
+                key="D",
+            ),
+            "blues": Song(
+                chord_pattern="I7 I7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 V7",
+                key="a",
+            ),
+            "blues-quick-change": Song(
+                chord_pattern="I7 IV7 I7 I7 IV7 IV7 I7 I7 V7 IV7 I7 V7",
+                key="a",
+            ),
+            "blues-slow-change": Song(
+                chord_pattern="I7 I7 I7 I7 IV7 IV7 I7 I7 V7 V7 I7 I7",
+                key="a",
+            ),
+            "blues7": Song(
+                chord_pattern="I IV I I7 IV IV7 I I7 V IV I V7",
+                key="a",
+                strum_pattern="D-DU-UD-/D-DU-UDU",
+            ),
+            "heyjude": Song(
+                beats_per_minute=150,
+                chord_pattern=(
                     "I I V V V7 V7 I I IV IV I I V V7 I I "  # verse
                     + "I7 I7 IV IVmaj7/iii ii7 IV/I V7 V7 I I"  # chorus
                 ),
-                "key": "F",
-                "strum_pattern": "D-D-D-DU",
-            },
-            "key": {
-                "chord_pattern": "I ii iii IV V vi viidim",
-                "key": "A",
-            },
-            "paintitblack": {
-                "beats_per_minute": 160,
-                "chord_pattern": "i VII III VII i i i i i VII III VII IV IV V/iv V/iv",
-                "key": "e",
-                "strum_pattern": "D-DU/DUD/U-UD/U-UD-",
-            },
-            "pop": {
-                "key": "C",
-                "pattern": "I V vi IV",
-            },
+                key="F",
+                strum_pattern="D-D-D-DU",
+            ),
+            "key": Song(
+                chord_pattern="I ii iii IV V vi viidim",
+                key="A",
+            ),
+            "paintitblack": Song(
+                beats_per_minute=160,
+                chord_pattern="i VII III VII i i i i i VII III VII IV IV V/iv V/iv",
+                key="e",
+                strum_pattern="D-DU/DUD/U-UD/U-UD-",
+            ),
+            "pop": Song(
+                chord_pattern="I V vi IV",
+                key="C",
+            ),
         }
         assert options.song in songs, "Please specify a song with --song"
         song = songs[options.song]
@@ -192,10 +200,10 @@ if __name__ == "__main__":
 
         play_midi_pattern(
             track=track,
-            key=song["key"],
-            chord_pattern=song["chord_pattern"],
-            strum_pattern=song.get("strum_pattern", "D-D-D-D-"),
-            beats_per_minute=song.get("beats_per_minute", 120),
+            key=song.key,
+            chord_pattern=song.chord_pattern,
+            strum_pattern=song.strum_pattern,
+            beats_per_minute=song.beats_per_minute,
             repeat=options.repeat,
         )
 
