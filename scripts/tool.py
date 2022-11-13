@@ -50,21 +50,34 @@ def print_key_chords(key: str, romans: Iterable[str]) -> None:
         )
 
 
-def strum_pattern(
-    key: str,
-    chord_pattern: str,
-    strum_pattern: str,
-    beats_per_minute=120,
-    repeat=1,
-):
-    track = Track(beats_per_minute=beats_per_minute)
+def print_song_info(song: Song):
+    chord_pattern_roman = song.chord_pattern.split()
+    chord_pattern_name = [
+        chord_name_from_roman(c, song.key) for c in chord_pattern_roman
+    ]
 
-    chord_pattern_roman = chord_pattern.split()
-    chord_pattern_name = [chord_name_from_roman(c, key) for c in chord_pattern_roman]
+    # Print chord pattern.
+    print_key_chords(song.key, set(chord_pattern_roman))
+    print("== chord pattern ==")
+    print(" ".join("%-3s" % x for x in chord_pattern_roman))
+    print(" ".join("%-3s" % x for x in chord_pattern_name))
+
+    # Print strumming pattern.
+    print("== strumming pattern ==")
+    print(song.strum_pattern)
+
+
+def strum_song(*, repeat: int, song: Song):
+    track = Track(beats_per_minute=song.beats_per_minute)
+
+    chord_pattern_roman = song.chord_pattern.split()
+    chord_pattern_name = [
+        chord_name_from_roman(c, song.key) for c in chord_pattern_roman
+    ]
 
     half_beat = Fraction(1, 2)
     strum_events: list[list[Fraction]] = []
-    for chunk in strum_pattern.split("/"):
+    for chunk in song.strum_pattern.split("/"):
         events = []
         assert chunk[0] in ("D", "U"), "strum pattern chunk must start with a strum"
         for strum in chunk:
@@ -82,13 +95,6 @@ def strum_pattern(
             for duration in strum_events[strum_index]:
                 track.add_notes(duration=duration, pitches=pitches)
             strum_index = (strum_index + 1) % len(strum_events)
-
-    # print chords
-    print_key_chords(key, set(chord_pattern_roman))
-    print("== pattern ==")
-    print(" ".join(chord_pattern_roman))
-    print("== chords ==")
-    print(" ".join(chord_pattern_name))
 
     return track
 
@@ -175,13 +181,8 @@ if __name__ == "__main__":
         assert options.song in songs, "Please specify a song with --song"
         song = songs[options.song]
 
-        track = strum_pattern(
-            key=song.key,
-            chord_pattern=song.chord_pattern,
-            strum_pattern=song.strum_pattern,
-            beats_per_minute=song.beats_per_minute,
-            repeat=options.repeat,
-        )
+        print_song_info(song)
+        track = strum_song(repeat=options.repeat, song=song)
 
         # Save to MIDI file.
         mid_file = mido.MidiFile()
