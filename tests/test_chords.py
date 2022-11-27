@@ -65,10 +65,12 @@ class ChordsTest(unittest.TestCase):
             ("Caug", "C"): ["C", "E", "G#"],
             ("Csus2", "C"): ["C", "D", "G"],
             ("Csus4", "C"): ["C", "F", "G"],
+            ("C6", "C"): ["C", "E", "G", "A"],
             ("C7", "C"): ["C", "E", "G", "A#"],  # FIXME: A# should be BB
             ("C9", "C"): ["C", "E", "G", "A#", "D"],  # FIXME: A# should be Bb
             ("Cmaj7", "C"): ["C", "E", "G", "B"],
             ("Cmaj9", "C"): ["C", "E", "G", "B", "D"],
+            ("Cm6", "C"): ["C", "D#", "G", "A"],  # FIXME: D# should be Eb
             ("Cm7", "C"): [
                 "C",
                 "D#",
@@ -107,8 +109,10 @@ class ChordsTest(unittest.TestCase):
             "C": [0, 4, 7],
             "Cm": [0, 3, 7],
             "Cdim": [0, 3, 6],
+            "C6": [0, 4, 7, 9],
             "C7": [0, 4, 7, 10],
             "Cmaj7": [0, 4, 7, 11],
+            "Cm6": [0, 3, 7, 9],
             "Cm7": [0, 3, 7, 10],
             "Cdim7": [0, 3, 6, 9],
         }

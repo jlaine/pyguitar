@@ -19,6 +19,9 @@ CHORD_QUALITY_TO_OFFSETS = {
     # suspended chords
     "sus2": (0, 2, 7),
     "sus4": (0, 5, 7),
+    # sixth chords
+    "6": (0, 4, 7, 9),
+    "m6": (0, 3, 7, 9),
     # seventh chords
     "7": (0, 4, 7, 10),
     "maj7": (0, 4, 7, 11),
