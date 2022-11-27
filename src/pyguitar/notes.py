@@ -160,9 +160,10 @@ def note_name_from_roman(roman: str, key: str) -> str:
     """
     Return the note name for the given `roman` numeral in the specified `key`.
     """
-    index = ROMAN_NUMERALS_LOWER.index(roman.lower())
+    numeral, alteration = parse_note_alteration(roman)
+    index = ROMAN_NUMERALS_LOWER.index(numeral.lower())
     notes = key_name_to_note_names(key)
-    return notes[index]
+    return notes[index] + alteration
 
 
 def note_name_to_pitch(note: str) -> int:
@@ -173,6 +174,14 @@ def note_name_to_pitch(note: str) -> int:
         if note in names:
             return value
     raise ValueError("Unknown note %s" % note)
+
+
+def parse_note_alteration(note: str) -> tuple[str, str]:
+    alteration = ""
+    if note.endswith("#") or note.endswith("b"):
+        alteration = note[-1]
+        note = note[:-1]
+    return note, alteration
 
 
 def prettify_chord(chord: str) -> str:

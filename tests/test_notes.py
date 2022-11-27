@@ -63,10 +63,12 @@ class NotesTest(unittest.TestCase):
             "V": "G",
             "VI": "A",
             "VII": "B",
+            "VII#": "B#",
         }
+        key = "C"
         for roman, name in notes.items():
-            with self.subTest(roman=roman):
-                self.assertEqual(note_name_from_roman(roman, "C"), name)
+            with self.subTest(roman=roman, key=key):
+                self.assertEqual(note_name_from_roman(roman, key), name)
 
     def test_note_name_to_pitch(self):
         notes = {

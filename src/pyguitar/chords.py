@@ -6,6 +6,7 @@ from pyguitar.notes import (
     note_name_from_pitch,
     note_name_from_roman,
     note_name_to_pitch,
+    parse_note_alteration,
     shift,
     unshift,
 )
@@ -77,10 +78,11 @@ def chord_name_from_roman(roman: str, key: str) -> str:
     Return a chord name for the given `roman` chord notation in the specified `key`.
     """
     numeral, quality, over = parse_chord_name(roman, ROMAN_ALPHABET)
+    numeral, alteration = parse_note_alteration(numeral)
 
     # get root
     minor = numeral.islower()
-    chord = note_name_from_roman(numeral, key)
+    chord = note_name_from_roman(numeral, key) + alteration
     if minor and quality != "dim":
         chord += "m"
     chord += quality

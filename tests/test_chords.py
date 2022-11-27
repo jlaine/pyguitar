@@ -51,12 +51,14 @@ class ChordsTest(unittest.TestCase):
             "V": "B",
             "VI": "C",
             "VII": "D",
+            "VII#": "D#",
             "VIIdim": "Ddim",
             "viidim": "Ddim",
         }
+        key = "e"
         for roman, name in chords.items():
-            with self.subTest(roman=roman):
-                self.assertEqual(chord_name_from_roman(roman, "e"), name)
+            with self.subTest(roman=roman, key=key):
+                self.assertEqual(chord_name_from_roman(roman, key), name)
 
     def test_chord_name_to_note_names(self):
         chords = {
