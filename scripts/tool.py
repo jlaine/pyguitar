@@ -132,6 +132,14 @@ if __name__ == "__main__":
                 chord_pattern="I vi IV V",
                 key="C",
             ),
+            "50-ways-to-leave-your-lover": Song(
+                chord_pattern="i/III VII6 VImaj7 V7b9 "
+                + "i VII#dim7 IIdim7 Vaug7 "
+                + "i VII6 VImaj7 V7b9 "
+                + "i iv7 i",
+                key="e",
+                strum_pattern="D---",
+            ),
             "blueforyou": Song(
                 beats_per_minute=90,
                 chord_pattern="I7 IV7 I7 I7 " + "IV7 IV7 I7 I7 " + "V7 IV7 I7 V7",
