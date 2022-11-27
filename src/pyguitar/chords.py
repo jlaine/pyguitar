@@ -27,6 +27,7 @@ CHORD_QUALITY_TO_OFFSETS = {
     "7": (0, 4, 7, 10),
     "maj7": (0, 4, 7, 11),
     "m7": (0, 3, 7, 10),
+    "aug7": (0, 4, 8, 10),
     "dim7": (0, 3, 6, 9),
     # ninth chords
     "9": (0, 4, 7, 10, 14),  # dominant ninth
