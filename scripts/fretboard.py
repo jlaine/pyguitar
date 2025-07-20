@@ -9,18 +9,21 @@ SCALE_NOTE_FUNCTIONS = ["R", "2", "3", "4", "5", "6", "7"]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Play with notes")
-    parser.add_argument("command", choices=["pentatonic", "triad"])
+    parser.add_argument("command", choices=["diatonic", "pentatonic", "triad"])
     parser.add_argument("--key", default="a")
     options = parser.parse_args()
 
     # Determine notes.
     names = key_name_to_note_names(options.key)
     pitches = key_name_to_pitches(options.key)
-    if options.command == "pentatonic":
-        # pentatonic scale
+    if options.command == "diatonic":
+        # Diatonic scale.
+        note_functions = SCALE_NOTE_FUNCTIONS
+    elif options.command == "pentatonic":
+        # Pentatonic scale.
         note_functions = ["R", "3", "4", "5", "7"]
     else:
-        # major triad
+        # Triad.
         note_functions = ["R", "3", "5"]
     note_indexes = [SCALE_NOTE_FUNCTIONS.index(n) for n in note_functions]
     note_colors = [SCALE_NOTE_COLORS[i] for i in note_indexes]
