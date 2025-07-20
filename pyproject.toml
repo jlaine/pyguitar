@@ -1,6 +1,38 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 
+[project]
+name = "pyguitar"
+description = "Python tools for guitar players"
+readme = "README.rst"
+license = "BSD-3-Clause"
+authors = [
+    { name = "Jeremy Lainé", email = "jeremy.laine@m4x.org" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "colorama",
+    "mido",
+    "scipy",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "mypy",
+    "ruff",
+    "types-colorama",
+]
+
+[project.urls]
+homepage = "https://github.com/jlaine/pyguitar"
+
 [tool.mypy]
 disallow_untyped_calls = true
 disallow_untyped_decorators = true
@@ -17,3 +49,6 @@ select = [
     "W",  # pycodestyle
     "I",  # isort
 ]
+
+[tool.setuptools.dynamic]
+version = {attr = "pyguitar.__version__"}
