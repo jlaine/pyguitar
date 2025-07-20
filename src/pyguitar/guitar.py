@@ -98,9 +98,9 @@ class Fretboard:
                         )
                     )
                     output += (
-                        '<text x="%f" y="%f" fill="%s" font-family="arial" font-size="12px" text-anchor="middle">%s</text>'
-                        % (cx, cy + 4, cell.color, cell.text)
-                    )
+                        '<text x="%f" y="%f" fill="%s" font-family="arial" '
+                        'font-size="12px" text-anchor="middle">%s</text>'
+                    ) % (cx, cy + 4, cell.color, cell.text)
 
         output += "</svg>"
         return output
