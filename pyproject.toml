@@ -1,2 +1,19 @@
 [build-system]
 requires = ["setuptools", "wheel"]
+
+[tool.mypy]
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+ignore_missing_imports = true
+mypy_path = "stubs"
+strict_optional = false
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle
+    "F",  # Pyflakes
+    "W",  # pycodestyle
+    "I",  # isort
+]

@@ -34,11 +34,9 @@ setuptools.setup(
     install_requires=["colorama", "mido", "scipy"],
     extras_require={
         "dev": [
-            "black",
             "coverage",
-            "flake8",
-            "isort",
             "mypy",
+            "ruff",
             "types-colorama",
         ]
     },
