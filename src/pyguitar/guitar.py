@@ -6,7 +6,7 @@ from colorama import Back, Fore, Style
 
 from pyguitar.notes import Note
 
-FRETS = 15
+FRETS = 16
 STRINGS = [Note.E2, Note.A2, Note.D3, Note.G3, Note.B3, Note.E4]
 
 
@@ -99,22 +99,22 @@ class Fretboard:
         string_spacing = 20
         board_width = string_spacing * (len(STRINGS) - 1)
         board_height = fret_spacing * FRETS
-        image_width = board_width + 2 * padding
+        image_width = board_width + 4 * padding
         image_height = board_height + 2 * padding
 
         if orientation == Orientation.LANDSCAPE:
-            svg_transform = f"translate(0, {image_width}) rotate(-90, 0, 0)"
+            svg_transform = f"translate(0, {image_width - 2*padding}) rotate(-90, 0, 0)"
             svg_viewbox = f"0 0 {image_height} {image_width}"
             text_angle = 90
         else:
-            svg_transform = ""
+            svg_transform = f"translate({2 * padding}, 0)"
             svg_viewbox = f"0 0 {image_width} {image_height}"
             text_angle = 0
 
         output = f'<svg viewBox="{svg_viewbox}" xmlns="http://www.w3.org/2000/svg">'
         output += f'<g transform="{svg_transform}">'
 
-        # draw strings
+        # Draw strings
         for string_idx, string_note in enumerate(STRINGS):
             x = padding + string_idx * string_spacing
             output += '<line x1="%f" y1="%f" x2="%f" y2="%f" stroke="black"/>' % (
@@ -124,7 +124,7 @@ class Fretboard:
                 padding + board_height,
             )
 
-        # draw frets
+        # Draw frets.
         for fret_idx in range(FRETS + 1):
             y = padding + fret_idx * fret_spacing
             output += '<line x1="%f" y1="%f" x2="%f" y2="%f" stroke="black"/>' % (
@@ -134,12 +134,21 @@ class Fretboard:
                 y,
             )
 
-        # draw markers
+        # Draw markers and number frets.
         for fret_idx, row in enumerate(self._cells):
+            cx = -padding
+            cy = padding + (fret_idx + 0.5) * fret_spacing
+
+            output += (
+                f'<text x="{cx}" y="{cy + 4}"'
+                ' font-family="arial" font-size="12px" text-anchor="middle"'
+                f' transform="rotate({text_angle}, {cx}, {cy})">'
+                f"{fret_idx}</text>\n"
+            )
+
             for string_idx, cell in enumerate(row):
                 if cell is not None:
                     cx = padding + string_idx * string_spacing
-                    cy = padding + (fret_idx + 0.5) * fret_spacing
                     output += (
                         '<circle cx="%d" cy="%f" r="%f" stroke="%s" fill="white" />'
                         % (
