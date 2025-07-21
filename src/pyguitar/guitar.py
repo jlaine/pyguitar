@@ -7,6 +7,7 @@ from colorama import Back, Fore, Style
 from pyguitar.notes import Note
 
 FRETS = 16
+FRET_MARKERS = [0, 3, 5, 7, 9]
 STRINGS = [Note.E2, Note.A2, Note.D3, Note.G3, Note.B3, Note.E4]
 
 
@@ -62,7 +63,14 @@ class Fretboard:
             else:
                 lines.append(
                     Fore.WHITE
-                    + "".join([f"{i:02}  " + ("" if i else " ") for i in range(FRETS)])
+                    + "".join(
+                        [
+                            (Style.BRIGHT if (i % 12) in FRET_MARKERS else Style.NORMAL)
+                            + f"{i:02}  "
+                            + ("" if i else " ")
+                            for i in range(FRETS)
+                        ]
+                    )
                 )
         return "".join(line + Style.RESET_ALL + "\n" for line in lines)
 
@@ -87,13 +95,14 @@ class Fretboard:
                 )
                 for cell in row
             )
-            # lines.append(("%.2d " % idx) + Back.WHITE + row_line)
             lines.append(f"{idx:02} " + Back.WHITE + line)
             marker = "-" if idx else "="
             lines.append(indent + Back.WHITE + Fore.BLACK + (marker * width))
         return "".join(line + Style.RESET_ALL + "\n" for line in lines)
 
     def dump_svg(self, *, orientation: Orientation) -> str:
+        font_family = "arial"
+        font_size = "12px"
         padding = 10
         fret_spacing = 30
         string_spacing = 20
@@ -103,7 +112,9 @@ class Fretboard:
         image_height = board_height + 2 * padding
 
         if orientation == Orientation.LANDSCAPE:
-            svg_transform = f"translate(0, {image_width - 2*padding}) rotate(-90, 0, 0)"
+            svg_transform = (
+                f"translate(0, {image_width - 2 * padding}) rotate(-90, 0, 0)"
+            )
             svg_viewbox = f"0 0 {image_height} {image_width}"
             text_angle = 90
         else:
@@ -117,21 +128,18 @@ class Fretboard:
         # Draw strings
         for string_idx, string_note in enumerate(STRINGS):
             x = padding + string_idx * string_spacing
-            output += '<line x1="%f" y1="%f" x2="%f" y2="%f" stroke="black"/>' % (
-                x,
-                padding,
-                x,
-                padding + board_height,
+            output += (
+                f'<line x1="{x}" y1="{padding}"'
+                f' x2="{x}" y2="{padding + board_height}" stroke="black"/>'
             )
 
         # Draw frets.
         for fret_idx in range(FRETS + 1):
             y = padding + fret_idx * fret_spacing
-            output += '<line x1="%f" y1="%f" x2="%f" y2="%f" stroke="black"/>' % (
-                padding,
-                y,
-                padding + board_width,
-                y,
+            output += (
+                f'<line x1="{padding}" y1="{y}"'
+                f' x2="{padding + board_width}" y2="{y}"'
+                f' stroke="black" stroke-width="{2 if fret_idx == 1 else 1}"/>'
             )
 
         # Draw markers and number frets.
@@ -139,9 +147,11 @@ class Fretboard:
             cx = -padding
             cy = padding + (fret_idx + 0.5) * fret_spacing
 
+            font_weight = "bold" if (fret_idx % 12) in FRET_MARKERS else "normal"
             output += (
                 f'<text x="{cx}" y="{cy + 4}"'
-                ' font-family="arial" font-size="12px" text-anchor="middle"'
+                f' font-family="{font_family}" font-size="{font_size}"'
+                f' font-weight="{font_weight}" text-anchor="middle"'
                 f' transform="rotate({text_angle}, {cx}, {cy})">'
                 f"{fret_idx}</text>\n"
             )
@@ -150,17 +160,13 @@ class Fretboard:
                 if cell is not None:
                     cx = padding + string_idx * string_spacing
                     output += (
-                        '<circle cx="%d" cy="%f" r="%f" stroke="%s" fill="white" />'
-                        % (
-                            cx,
-                            cy,
-                            string_spacing / 2.5,
-                            cell.color,
-                        )
+                        f'<circle cx="{cx}" cy="{cy}" r="{string_spacing / 2.5}"'
+                        f' stroke="{cell.color}" fill="white" />'
                     )
                     output += (
                         f'<text x="{cx}" y="{cy + 4}" fill="{cell.color}"'
-                        ' font-family="arial" font-size="12px" text-anchor="middle"'
+                        f' font-family="{font_family}" font-size="{font_size}"'
+                        ' text-anchor="middle"'
                         f' transform="rotate({text_angle}, {cx}, {cy})">'
                         f"{cell.text}</text>"
                     )
