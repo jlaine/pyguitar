@@ -9,7 +9,7 @@ from pyguitar.chords import (
 
 
 class ChordsTest(unittest.TestCase):
-    def test_chord_name_from_roman(self):
+    def test_chord_name_from_roman(self) -> None:
         chords = {
             # major
             "I": "C",
@@ -42,7 +42,7 @@ class ChordsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             chord_name_from_roman("VV", key)
 
-    def test_chord_name_from_roman_minor_key(self):
+    def test_chord_name_from_roman_minor_key(self) -> None:
         chords = {
             "I": "E",
             "II": "F#",
@@ -60,7 +60,7 @@ class ChordsTest(unittest.TestCase):
             with self.subTest(roman=roman, key=key):
                 self.assertEqual(chord_name_from_roman(roman, key), name)
 
-    def test_chord_name_to_note_names(self):
+    def test_chord_name_to_note_names(self) -> None:
         chords = {
             # key of C
             ("C", "C"): ["C", "E", "G"],
@@ -106,7 +106,7 @@ class ChordsTest(unittest.TestCase):
             with self.subTest(chord=chord, key=key):
                 self.assertEqual(chord_name_to_note_names(chord, key), notes)
 
-    def test_chord_name_to_pitches(self):
+    def test_chord_name_to_pitches(self) -> None:
         chords = {
             "C/B": [11, 0, 4, 7],
             "C": [0, 4, 7],

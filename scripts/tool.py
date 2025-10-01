@@ -50,7 +50,7 @@ def print_key_chords(key: str, romans: Iterable[str]) -> None:
         )
 
 
-def print_song_info(song: Song):
+def print_song_info(song: Song) -> None:
     chord_pattern_roman = song.chord_pattern.split()
     chord_pattern_name = [
         chord_name_from_roman(c, song.key) for c in chord_pattern_roman
@@ -67,7 +67,7 @@ def print_song_info(song: Song):
     print(song.strum_pattern)
 
 
-def strum_song(*, repeat: int, song: Song):
+def strum_song(*, repeat: int, song: Song) -> Track:
     track = Track(beats_per_minute=song.beats_per_minute)
 
     chord_pattern_roman = song.chord_pattern.split()
