@@ -34,13 +34,8 @@ dev = [
 homepage = "https://github.com/jlaine/pyguitar"
 
 [tool.mypy]
-disallow_untyped_calls = true
-disallow_untyped_decorators = true
-ignore_missing_imports = true
 mypy_path = "stubs"
-strict_optional = false
-warn_redundant_casts = true
-warn_unused_ignores = true
+strict = true
 
 [tool.ruff.lint]
 select = [

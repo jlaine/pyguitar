@@ -12,7 +12,7 @@ from pyguitar.notes import (
 
 
 class NotesTest(unittest.TestCase):
-    def test_key_name_to_note_names(self):
+    def test_key_name_to_note_names(self) -> None:
         keys = {
             # Major scales.
             "Cb": ["Cb", "Db", "Eb", "Fb", "Gb", "Ab", "Bb"],
@@ -54,7 +54,7 @@ class NotesTest(unittest.TestCase):
             key_name_to_note_names("B#")
         self.assertEqual(str(cm.exception), "Scale cannot start with B#")
 
-    def test_note_name_from_roman(self):
+    def test_note_name_from_roman(self) -> None:
         notes = {
             "I": "C",
             "II": "D",
@@ -70,7 +70,7 @@ class NotesTest(unittest.TestCase):
             with self.subTest(roman=roman, key=key):
                 self.assertEqual(note_name_from_roman(roman, key), name)
 
-    def test_note_name_to_pitch(self):
+    def test_note_name_to_pitch(self) -> None:
         notes = {
             "C": 0,
             "C#": 1,
@@ -93,7 +93,7 @@ class NotesTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             note_name_to_pitch("X")
 
-    def test_prettify_chord(self):
+    def test_prettify_chord(self) -> None:
         notes = {
             "C": "C",
             "Cm": "Cm",
@@ -106,7 +106,7 @@ class NotesTest(unittest.TestCase):
             with self.subTest(plain=plain):
                 self.assertEqual(prettify_chord(plain), pretty)
 
-    def test_prettify_key(self):
+    def test_prettify_key(self) -> None:
         notes = {
             "C": "C major",
             "Cb": "C♭ major",
@@ -119,7 +119,7 @@ class NotesTest(unittest.TestCase):
             with self.subTest(plain=plain):
                 self.assertEqual(prettify_key(plain), pretty)
 
-    def test_prettify_note(self):
+    def test_prettify_note(self) -> None:
         notes = {
             "C": "C",
             "Cb": "C♭",

@@ -1,5 +1,5 @@
 import functools
-from typing import Sequence
+from typing import Sequence, cast
 
 
 class Note:
@@ -78,7 +78,9 @@ KEYS = [
 KEY_INDEXES = [(f + 7) % len(KEYS) for f in range(len(KEYS))]
 KEY_SIGNATURES = {}
 MAJOR_KEYS = [KEYS[i][0] for i in KEY_INDEXES if KEYS[i][0] is not None]
-MINOR_KEYS = [KEYS[i][1] for i in KEY_INDEXES if KEYS[i][1] is not None]
+MINOR_KEYS = cast(
+    list[str], [KEYS[i][1] for i in KEY_INDEXES if KEYS[i][1] is not None]
+)  # mypy does not detect this list will only contain strings.
 for idx, (major, minor) in enumerate(KEYS):
     if major is not None:
         KEY_SIGNATURES[major] = idx - 7

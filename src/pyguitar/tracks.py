@@ -20,7 +20,7 @@ class Track:
             [TrackNote(duration=duration, pitch=pitch) for pitch in pitches]
         )
 
-    def to_midi(self, beat_time=480) -> mido.MidiTrack:
+    def to_midi(self, beat_time: int = 480) -> mido.MidiTrack:
         midi_track = mido.MidiTrack()
         midi_track.append(
             mido.MetaMessage(
