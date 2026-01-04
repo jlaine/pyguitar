@@ -12,11 +12,11 @@ PENTATONIC_NOTE_FUNCTIONS = ["R", "3", "4", "5", "7"]
 
 def plot_notes(
     *,
+    basename: str,
     note_colors: list[str],
     note_texts: list[str],
     note_values: list[int],
     orientation: Orientation,
-    svg_path: str,
 ) -> None:
     # Place notes on fretboard.
     board = Fretboard()
@@ -30,9 +30,12 @@ def plot_notes(
     # Display fretboard.
     sys.stdout.write(board.dump_ansi(orientation=orientation))
 
-    # Write file.
-    with open(svg_path, "w") as fp:
+    # Write files.
+    with open(basename + ".svg", "w") as fp:
         fp.write(board.dump_svg(orientation=orientation))
+
+    with open(basename + ".pdf", "wb") as fp:
+        fp.write(board.dump_pdf(orientation=orientation))
 
 
 def main() -> None:
@@ -80,21 +83,21 @@ def main() -> None:
             sys.stdout.write(f"{function} = {name}\n")
 
         plot_notes(
+            basename=f"{scale_type}-{options.key.lower()}-{key_type}",
             note_colors=[SCALE_NOTE_COLORS[i] for i in note_indexes],
             note_texts=note_functions,
             note_values=[pitches[i] % 12 for i in note_indexes],
             orientation=orientation,
-            svg_path=f"{scale_type}-{options.key.lower()}-{key_type}.svg",
         )
 
     else:
         note_values = [i % 12 for i in chord_name_to_pitches(options.chord)]
         plot_notes(
+            basename=f"chord-{options.chord}",
             note_values=note_values,
             note_colors=[SCALE_NOTE_COLORS[i] for i in range(len(note_values))],
             note_texts=chord_name_to_note_names(options.chord, key="C"),
             orientation=orientation,
-            svg_path=f"chord-{options.chord}.svg",
         )
 
 
