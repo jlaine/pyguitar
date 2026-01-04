@@ -47,7 +47,14 @@ if __name__ == "__main__":
     else:
         orientation = Orientation.LANDSCAPE
     sys.stdout.write(board.dump_ansi(orientation=orientation))
-    with open("board.svg", "w") as fp:
+
+    # Write file.
+    if options.key[0] == options.key[0].upper():
+        key_type = "major"
+    else:
+        key_type = "minor"
+    path = f"{options.command}-{options.key.lower()}-{key_type}.svg"
+    with open(path, "w") as fp:
         fp.write(board.dump_svg(orientation=orientation))
 
     # Display note names.
