@@ -1,37 +1,23 @@
 import argparse
 import sys
 
+from pyguitar.chords import chord_name_to_note_names, chord_name_to_pitches
 from pyguitar.guitar import Cell, Fretboard, Orientation
 from pyguitar.notes import key_name_to_note_names, key_name_to_pitches
 
 SCALE_NOTE_COLORS = ["red", "black", "green", "magenta", "blue", "black", "magenta"]
-SCALE_NOTE_FUNCTIONS = ["R", "2", "3", "4", "5", "6", "7"]
+DIATONIC_NOTE_FUNCTIONS = ["R", "2", "3", "4", "5", "6", "7"]
+PENTATONIC_NOTE_FUNCTIONS = ["R", "3", "4", "5", "7"]
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Play with notes")
-    parser.add_argument("command", choices=["diatonic", "pentatonic", "triad"])
-    parser.add_argument("--key", default="a")
-    parser.add_argument("--portrait", action="store_true")
-    options = parser.parse_args()
-
-    # Determine notes.
-    names = key_name_to_note_names(options.key)
-    pitches = key_name_to_pitches(options.key)
-    if options.command == "diatonic":
-        # Diatonic scale.
-        note_functions = SCALE_NOTE_FUNCTIONS
-    elif options.command == "pentatonic":
-        # Pentatonic scale.
-        note_functions = ["R", "3", "4", "5", "7"]
-    else:
-        # Triad.
-        note_functions = ["R", "3", "5"]
-    note_indexes = [SCALE_NOTE_FUNCTIONS.index(n) for n in note_functions]
-    note_colors = [SCALE_NOTE_COLORS[i] for i in note_indexes]
-    note_names = [names[i] for i in note_indexes]
-    note_values = [pitches[i] % 12 for i in note_indexes]
-
+def plot_notes(
+    *,
+    note_colors: list[str],
+    note_texts: list[str],
+    note_values: list[int],
+    orientation: Orientation,
+    svg_path: str,
+) -> None:
     # Place notes on fretboard.
     board = Fretboard()
     for pos, note_value in board.walk():
@@ -39,24 +25,78 @@ if __name__ == "__main__":
             idx = note_values.index(note_value % 12)
         except ValueError:
             continue
-        board.set(pos, Cell(color=note_colors[idx], text=note_functions[idx]))
+        board.set(pos, Cell(color=note_colors[idx], text=note_texts[idx]))
 
     # Display fretboard.
+    sys.stdout.write(board.dump_ansi(orientation=orientation))
+
+    # Write file.
+    with open(svg_path, "w") as fp:
+        fp.write(board.dump_svg(orientation=orientation))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Play with notes")
+    parser.add_argument("--portrait", action="store_true")
+
+    subparsers = parser.add_subparsers(
+        dest="command", required=True, help="The command to run."
+    )
+    subparser = subparsers.add_parser("scale", help="Show the notes of a scale.")
+    subparser.add_argument("--pentatonic", action="store_true")
+    subparser.add_argument("key")
+
+    subparser = subparsers.add_parser("chord", help="Show the notes of a chord.")
+    subparser.add_argument("chord")
+    options = parser.parse_args()
+
     if options.portrait:
         orientation = Orientation.PORTRAIT
     else:
         orientation = Orientation.LANDSCAPE
-    sys.stdout.write(board.dump_ansi(orientation=orientation))
 
-    # Write file.
-    if options.key[0] == options.key[0].upper():
-        key_type = "major"
+    # Determine notes.
+    if options.command == "scale":
+        names = key_name_to_note_names(options.key)
+        pitches = key_name_to_pitches(options.key)
+        if options.pentatonic:
+            # Pentatonic scale.
+            note_functions = PENTATONIC_NOTE_FUNCTIONS
+            scale_type = "pentatonic"
+        else:
+            # Diatonic scale.
+            note_functions = DIATONIC_NOTE_FUNCTIONS
+            scale_type = "diatonic"
+
+        if options.key[0] == options.key[0].upper():
+            key_type = "major"
+        else:
+            key_type = "minor"
+        note_indexes = [DIATONIC_NOTE_FUNCTIONS.index(n) for n in note_functions]
+        note_names = [names[i] for i in note_indexes]
+
+        # Display note names.
+        for function, name in zip(note_functions, note_names):
+            sys.stdout.write(f"{function} = {name}\n")
+
+        plot_notes(
+            note_colors=[SCALE_NOTE_COLORS[i] for i in note_indexes],
+            note_texts=note_functions,
+            note_values=[pitches[i] % 12 for i in note_indexes],
+            orientation=orientation,
+            svg_path=f"{scale_type}-{options.key.lower()}-{key_type}.svg",
+        )
+
     else:
-        key_type = "minor"
-    path = f"{options.command}-{options.key.lower()}-{key_type}.svg"
-    with open(path, "w") as fp:
-        fp.write(board.dump_svg(orientation=orientation))
+        note_values = [i % 12 for i in chord_name_to_pitches(options.chord)]
+        plot_notes(
+            note_values=note_values,
+            note_colors=[SCALE_NOTE_COLORS[i] for i in range(len(note_values))],
+            note_texts=chord_name_to_note_names(options.chord, key="C"),
+            orientation=orientation,
+            svg_path=f"chord-{options.chord}.svg",
+        )
 
-    # Display note names.
-    for function, name in zip(note_functions, note_names):
-        sys.stdout.write(f"{function} = {name}\n")
+
+if __name__ == "__main__":
+    main()
