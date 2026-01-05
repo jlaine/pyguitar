@@ -18,7 +18,6 @@ classifiers = [
 dependencies = [
     "colorama",
     "mido",
-    "scipy",
 ]
 dynamic = ["version"]
 
