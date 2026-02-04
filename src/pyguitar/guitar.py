@@ -33,6 +33,10 @@ class Orientation(enum.Enum):
 
 
 class PdfPainter:
+    """
+    Graphics primitives for writing to PDF.
+    """
+
     def __init__(self, draw: pydyf.Stream, rotate_text: bool) -> None:
         self.draw = draw
         self.rotate_text = rotate_text
@@ -102,22 +106,28 @@ class PdfPainter:
         self.draw.stroke()
         self.draw.pop_state()
 
-    def draw_text(self, *, cx: float, cy: float, text: str, fill: str) -> None:
-        font_size = 12
-        letter_width = 4
+    def draw_text(
+        self,
+        *,
+        cx: float,
+        cy: float,
+        text: str,
+        fill: str,
+        font_size: int,
+    ) -> None:
+        # Accurately placing the text horizontally would require
+        # gathering per-font metrics.
+        x_offset = len(text) * font_size / 3
+        y_offset = font_size / 3
 
         self.draw.push_state()
         self.draw.set_color_rgb(*PDF_COLORS[fill], stroke=False)
         self.draw.begin_text()
         if self.rotate_text:
             self.draw.set_matrix(0, -1, 1, 0, 0, 0)
-            self.draw.move_text_to(
-                self._x(cy - len(text) * letter_width), self._y(4 - cx)
-            )
+            self.draw.move_text_to(self._x(cy - x_offset), self._y(y_offset - cx))
         else:
-            self.draw.move_text_to(
-                self._x(cx - len(text) * letter_width), self._y(cy + 4)
-            )
+            self.draw.move_text_to(self._x(cx - x_offset), self._y(cy + y_offset))
         self.draw.set_font_size("F1", font_size)
         self.draw.show_text(pydyf.String(text.encode("macroman")))
         self.draw.end_text()
@@ -134,6 +144,10 @@ class PdfPainter:
 
 
 class SvgPainter:
+    """
+    Graphics primitives for writing to SVG.
+    """
+
     def __init__(self, rotate_text: bool) -> None:
         self.output = ""
         self.text_angle = 90 if rotate_text else 0
@@ -161,12 +175,20 @@ class SvgPainter:
             f' stroke="{stroke}" stroke-width="{stroke_width}"/>'
         )
 
-    def draw_text(self, *, cx: float, cy: float, text: str, fill: str) -> None:
+    def draw_text(
+        self,
+        *,
+        cx: float,
+        cy: float,
+        text: str,
+        fill: str,
+        font_size: int,
+    ) -> None:
         font_family = "arial"
-        font_size = "12"
+        y_offset = font_size / 3
 
         self.output += (
-            f'<text x="{cx}" y="{cy + 4}" fill="{fill}"'
+            f'<text x="{cx}" y="{cy + y_offset}" fill="{fill}"'
             f' font-family="{font_family}" font-size="{font_size}px"'
             f' text-anchor="middle"'
             f' transform="rotate({self.text_angle}, {cx}, {cy})">'
@@ -188,12 +210,15 @@ class Fretboard:
         self._image_height = self._board_height + 2 * self._padding
 
     def dump_ansi(self, *, orientation: Orientation) -> str:
+        """
+        Write to an ANSI string.
+        """
         if orientation == Orientation.LANDSCAPE:
-            return self.dump_ansi_landscape()
+            return self._dump_ansi_landscape()
         else:
-            return self.dump_ansi_portrait()
+            return self._dump_ansi_portrait()
 
-    def dump_ansi_landscape(self) -> str:
+    def _dump_ansi_landscape(self) -> str:
         def pad(i: str) -> str:
             if len(i) == 1:
                 return "-" + i + "-"
@@ -226,7 +251,7 @@ class Fretboard:
                 )
         return "".join(line + Style.RESET_ALL + "\n" for line in lines)
 
-    def dump_ansi_portrait(self) -> str:
+    def _dump_ansi_portrait(self) -> str:
         def pad(i: str) -> str:
             if len(i) == 1:
                 return " " + i + " "
@@ -253,6 +278,9 @@ class Fretboard:
         return "".join(line + Style.RESET_ALL + "\n" for line in lines)
 
     def dump_pdf(self, *, orientation: Orientation) -> bytes:
+        """
+        Write the fretboard to a PDF document.
+        """
         if orientation == Orientation.LANDSCAPE:
             doc_matrix = [0, 1, -1, 0, 0, 2 * self._padding]
             doc_viewbox = [0, 0, self._image_height, self._image_width]
@@ -303,6 +331,9 @@ class Fretboard:
         return buf.getvalue()
 
     def dump_svg(self, *, orientation: Orientation) -> str:
+        """
+        Write the fretboard to an SVG image.
+        """
         if orientation == Orientation.LANDSCAPE:
             svg_transform = (
                 f"translate(0, {self._image_width - 2 * self._padding}) "
@@ -365,6 +396,7 @@ class Fretboard:
                 cy=cy,
                 text=str(fret_idx),
                 fill="black",
+                font_size=12,
             )
 
             for string_idx, cell in enumerate(row):
@@ -382,4 +414,5 @@ class Fretboard:
                         cy=cy,
                         text=cell.text,
                         fill=cell.color,
+                        font_size=12,
                     )
