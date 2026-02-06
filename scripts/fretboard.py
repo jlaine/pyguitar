@@ -96,7 +96,7 @@ def main() -> None:
             basename=f"chord-{options.chord}",
             note_values=note_values,
             note_colors=[SCALE_NOTE_COLORS[i] for i in range(len(note_values))],
-            note_texts=chord_name_to_note_names(options.chord, key="C"),
+            note_texts=chord_name_to_note_names(options.chord),
             orientation=orientation,
         )
 

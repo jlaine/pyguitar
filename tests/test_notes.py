@@ -1,6 +1,8 @@
 import unittest
 
 from pyguitar.notes import (
+    augment,
+    diminish,
     key_name_to_note_names,
     note_name_from_pitch,
     note_name_from_roman,
@@ -12,6 +14,14 @@ from pyguitar.notes import (
 
 
 class NotesTest(unittest.TestCase):
+    def test_augment(self) -> None:
+        self.assertEqual(augment("C"), "C#")
+        self.assertEqual(augment("Cb"), "C")
+
+    def test_diminish(self) -> None:
+        self.assertEqual(diminish("C"), "Cb")
+        self.assertEqual(diminish("C#"), "C")
+
     def test_key_name_to_note_names(self) -> None:
         keys = {
             # Major scales.
@@ -64,6 +74,7 @@ class NotesTest(unittest.TestCase):
             "VI": "A",
             "VII": "B",
             "VII#": "B#",
+            "VIIbb": "Bbb",
         }
         key = "C"
         for roman, name in notes.items():

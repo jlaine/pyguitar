@@ -43,7 +43,7 @@ def print_key_chords(key: str, romans: Iterable[str]) -> None:
                 " ".join(
                     [
                         "%-2s" % prettify_note(note)
-                        for note in chord_name_to_note_names(chord_name, key)
+                        for note in chord_name_to_note_names(chord_name)
                     ]
                 ),
             )
