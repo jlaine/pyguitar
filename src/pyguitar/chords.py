@@ -1,8 +1,12 @@
 import re
 
 from pyguitar.notes import (
+    MAJOR_SCALE,
     NOTE_ALPHABET,
     ROMAN_ALPHABET,
+    augment,
+    diminish,
+    key_name_to_note_names,
     note_name_from_pitch,
     note_name_from_roman,
     note_name_to_pitch,
@@ -11,36 +15,77 @@ from pyguitar.notes import (
     unshift,
 )
 
-CHORD_QUALITY_TO_OFFSETS = {
+CHORD_QUALITY_TO_INTERVAL_NAMES = {
     # triads
-    "": (0, 4, 7),
-    "m": (0, 3, 7),
-    "aug": (0, 4, 8),
-    "dim": (0, 3, 6),
+    "": ("1", "3", "5"),
+    "m": ("1", "b3", "5"),
+    "aug": ("1", "3", "#5"),
+    "dim": ("1", "b3", "b5"),
     # suspended chords
-    "sus2": (0, 2, 7),
-    "sus4": (0, 5, 7),
+    "sus2": ("1", "2", "5"),
+    "sus4": ("1", "4", "5"),
     # sixth chords
-    "6": (0, 4, 7, 9),
-    "m6": (0, 3, 7, 9),
+    "6": ("1", "3", "5", "6"),
+    "m6": ("1", "b3", "5", "6"),
     # seventh chords
-    "7": (0, 4, 7, 10),
-    "maj7": (0, 4, 7, 11),
-    "m7": (0, 3, 7, 10),
-    "aug7": (0, 4, 8, 10),
-    "dim7": (0, 3, 6, 9),
+    "7": ("1", "3", "5", "b7"),  # dominant seventh
+    "maj7": ("1", "3", "5", "7"),  # major seventh
+    "m7": ("1", "b3", "5", "b7"),  # minor seventh
+    "m7b5": ("1", "b3", "b5", "b7"),  # minor seventh flat five
+    "mmaj7": ("1", "b3", "5", "7"),  # minor major seventh
+    "aug7": ("1", "3", "#5", "b7"),  # augmented seventh
+    "augmaj7": ("1", "3", "#5", "7"),  # augmented major seventh
+    "dim7": ("1", "b3", "b5", "bb7"),  # diminished seventh
     # ninth chords
-    "9": (0, 4, 7, 10, 14),  # dominant ninth
-    "maj9": (0, 4, 7, 11, 14),  # major ninth
-    "m9": (0, 3, 7, 10, 14),  # minor ninth
-    "7b9": (0, 4, 7, 10, 13),  # dominant minor ninth
+    "9": ("1", "3", "5", "b7", "9"),  # dominant ninth
+    "maj9": ("1", "3", "5", "7", "9"),  # major ninth
+    "m9": ("1", "b3", "5", "b7", "9"),  # minor ninth
+    "7b9": ("1", "3", "5", "b7", "b9"),  # dominant minor ninth
 }
-CHORD_OFFSETS_TO_QUALITY = dict(
-    (tuple(v), k) for (k, v) in CHORD_QUALITY_TO_OFFSETS.items()
-)
 
 
-def parse_chord_name(name: str, alphabet: list[str]) -> tuple[str, str, str]:
+def _apply_interval_to_note(root: str, interval: str) -> str:
+    alterations, offset = _parse_interval(interval)
+
+    # Apply the interval and alteration.
+    notes_in_key = key_name_to_note_names(root)
+    note = notes_in_key[offset % 7]
+    for alteration in alterations:
+        if alteration == "#":
+            note = augment(note)
+        else:
+            note = diminish(note)
+    return note
+
+
+def _get_interval_pitch(interval: str) -> int:
+    alterations, offset = _parse_interval(interval)
+
+    value = MAJOR_SCALE[offset % 7] + 12 * (offset // 7)
+    for alteration in alterations:
+        if alteration == "#":
+            value += 1
+        else:
+            value -= 1
+    return value
+
+
+def _parse_interval(interval: str) -> tuple[str, int]:
+    m = re.match(r"^([b#]*)(\d+)$", interval)
+    assert m, f"Invalid interval {interval}"
+    alterations = m.group(1)
+    offset = int(m.group(2)) - 1
+    return alterations, offset
+
+
+CHORD_QUALITY_TO_OFFSETS = {
+    k: tuple(_get_interval_pitch(i) for i in v)
+    for (k, v) in CHORD_QUALITY_TO_INTERVAL_NAMES.items()
+}
+CHORD_OFFSETS_TO_QUALITY = {v: k for (k, v) in CHORD_QUALITY_TO_OFFSETS.items()}
+
+
+def _parse_chord_name(name: str, alphabet: list[str]) -> tuple[str, str, str]:
     alphabet_re = "(?:" + ("|".join(alphabet)) + ")[b#]?"
     quality_re = "|".join(CHORD_QUALITY_TO_OFFSETS.keys())
     chord_re = re.compile(
@@ -78,7 +123,7 @@ def chord_name_from_roman(roman: str, key: str) -> str:
     """
     Return a chord name for the given `roman` chord notation in the specified `key`.
     """
-    numeral, quality, over = parse_chord_name(roman, ROMAN_ALPHABET)
+    numeral, quality, over = _parse_chord_name(roman, ROMAN_ALPHABET)
     numeral, alteration = parse_note_alteration(numeral)
 
     # get root
@@ -99,7 +144,7 @@ def chord_name_to_pitches(chord: str) -> list[int]:
     """
     Return the pitches to play the specified `chord`.
     """
-    root_name, quality, over = parse_chord_name(chord, NOTE_ALPHABET)
+    root_name, quality, over = _parse_chord_name(chord, NOTE_ALPHABET)
     root_pitch = note_name_to_pitch(root_name)
 
     pitches = shift(root_pitch, CHORD_QUALITY_TO_OFFSETS[quality])
@@ -109,9 +154,15 @@ def chord_name_to_pitches(chord: str) -> list[int]:
     return pitches
 
 
-def chord_name_to_note_names(chord: str, key: str) -> list[str]:
+def chord_name_to_note_names(chord: str) -> list[str]:
     """
     Return the note names to play the specified `chord`.
     """
-    pitches = chord_name_to_pitches(chord)
-    return [note_name_from_pitch(p, key) for p in pitches]
+    root_name, quality, over = _parse_chord_name(chord, NOTE_ALPHABET)
+    names = [
+        _apply_interval_to_note(root_name, interval)
+        for interval in CHORD_QUALITY_TO_INTERVAL_NAMES[quality]
+    ]
+    if over:
+        names.insert(0, over)
+    return names

@@ -62,49 +62,39 @@ class ChordsTest(unittest.TestCase):
 
     def test_chord_name_to_note_names(self) -> None:
         chords = {
-            # key of C
-            ("C", "C"): ["C", "E", "G"],
-            ("Caug", "C"): ["C", "E", "G#"],
-            ("Csus2", "C"): ["C", "D", "G"],
-            ("Csus4", "C"): ["C", "F", "G"],
-            ("C6", "C"): ["C", "E", "G", "A"],
-            ("C7", "C"): ["C", "E", "G", "A#"],  # FIXME: A# should be Bb
-            ("C9", "C"): ["C", "E", "G", "A#", "D"],  # FIXME: A# should be Bb
-            ("Cmaj7", "C"): ["C", "E", "G", "B"],
-            ("Cmaj9", "C"): ["C", "E", "G", "B", "D"],
-            ("Cm6", "C"): ["C", "D#", "G", "A"],  # FIXME: D# should be Eb
-            ("Cm7", "C"): [
-                "C",
-                "D#",
-                "G",
-                "A#",
-            ],  # FIXME: D# should be Eb, A# should be Bb
-            ("Caug7", "C"): ["C", "E", "G#", "A#"],  # FIXME: A# should be Bb
-            ("Cm9", "C"): [
-                "C",
-                "D#",
-                "G",
-                "A#",
-                "D",
-            ],  # FIXME: D# should be Eb, A# should be Bb
-            ("C7b9", "C"): [
-                "C",
-                "E",
-                "G",
-                "A#",
-                "C#",
-            ],  # FIXME: A# should be Bb, C# should be Db
-            ("Dm", "C"): ["D", "F", "A"],
-            ("Bdim", "C"): ["B", "D", "F"],
-            # key of C#
-            ("C#", "C#"): ["C#", "E#", "G#"],
-            ("C#7", "C#"): ["C#", "E#", "G#", "B"],
-            # key of e
-            ("B/A", "e"): ["A", "B", "D#", "F#"],
+            # triads
+            "C": ["C", "E", "G"],
+            "Cm": ["C", "Eb", "G"],
+            "Caug": ["C", "E", "G#"],
+            "Cdim": ["C", "Eb", "Gb"],
+            # suspended chords
+            "Csus2": ["C", "D", "G"],
+            "Csus4": ["C", "F", "G"],
+            # sixth chords
+            "C6": ["C", "E", "G", "A"],
+            "Cm6": ["C", "Eb", "G", "A"],
+            # seventh chords
+            "C7": ["C", "E", "G", "Bb"],
+            "Cmaj7": ["C", "E", "G", "B"],
+            "Cm7": ["C", "Eb", "G", "Bb"],
+            "Cm7b5": ["C", "Eb", "Gb", "Bb"],
+            "Cmmaj7": ["C", "Eb", "G", "B"],
+            "Caug7": ["C", "E", "G#", "Bb"],
+            "Caugmaj7": ["C", "E", "G#", "B"],
+            "Cdim7": ["C", "Eb", "Gb", "Bbb"],
+            # ninth chords
+            "C9": ["C", "E", "G", "Bb", "D"],
+            "Cmaj9": ["C", "E", "G", "B", "D"],
+            "Cm9": ["C", "Eb", "G", "Bb", "D"],
+            "C7b9": ["C", "E", "G", "Bb", "Db"],
+            # other
+            "C#": ["C#", "E#", "G#"],
+            "C#7": ["C#", "E#", "G#", "B"],
+            "B/A": ["A", "B", "D#", "F#"],
         }
-        for (chord, key), notes in chords.items():
-            with self.subTest(chord=chord, key=key):
-                self.assertEqual(chord_name_to_note_names(chord, key), notes)
+        for chord, notes in chords.items():
+            with self.subTest(chord=chord):
+                self.assertEqual(chord_name_to_note_names(chord), notes)
 
     def test_chord_name_to_pitches(self) -> None:
         chords = {

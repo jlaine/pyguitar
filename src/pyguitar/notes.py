@@ -66,7 +66,7 @@ KEYS = [
     ("Eb", "c"),
     ("Bb", "g"),
     ("F", "d"),
-    ("C", "a"),
+    ("C", "a"),  # no alterations
     ("G", "e"),
     ("D", "b"),
     ("A", "f#"),
@@ -129,6 +129,26 @@ def build_note_names(key: str) -> list[str]:
     return all_note_names
 
 
+def augment(note: str) -> str:
+    """
+    Augment the given note.
+    """
+    if note.endswith("b"):
+        return note[:-1]
+    else:
+        return note + "#"
+
+
+def diminish(note: str) -> str:
+    """
+    Diminish the given note.
+    """
+    if note.endswith("#"):
+        return note[:-1]
+    else:
+        return note + "b"
+
+
 def key_name_to_note_names(key: str) -> list[str]:
     """
     Return the list of note names in the given `key`.
@@ -180,8 +200,8 @@ def note_name_to_pitch(note: str) -> int:
 
 def parse_note_alteration(note: str) -> tuple[str, str]:
     alteration = ""
-    if note.endswith("#") or note.endswith("b"):
-        alteration = note[-1]
+    while note.endswith("#") or note.endswith("b"):
+        alteration = note[-1] + alteration
         note = note[:-1]
     return note, alteration
 
