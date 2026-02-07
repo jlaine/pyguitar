@@ -3,6 +3,7 @@ import unittest
 from pyguitar.chords import (
     chord_name_from_pitches,
     chord_name_from_roman,
+    chord_name_to_interval_names,
     chord_name_to_note_names,
     chord_name_to_pitches,
 )
@@ -59,6 +60,9 @@ class ChordsTest(unittest.TestCase):
         for roman, name in chords.items():
             with self.subTest(roman=roman, key=key):
                 self.assertEqual(chord_name_from_roman(roman, key), name)
+
+    def test_chord_name_to_interval_names(self) -> None:
+        self.assertEqual(chord_name_to_interval_names("C"), ["1", "3", "5"])
 
     def test_chord_name_to_note_names(self) -> None:
         chords = {

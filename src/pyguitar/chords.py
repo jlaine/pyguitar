@@ -154,6 +154,15 @@ def chord_name_to_pitches(chord: str) -> list[int]:
     return pitches
 
 
+def chord_name_to_interval_names(chord: str) -> list[str]:
+    """
+    Return the interval names for the specified `chord`.
+    """
+    root_name, quality, over = _parse_chord_name(chord, NOTE_ALPHABET)
+    assert not over, "Slash chords are not supported"
+    return list(CHORD_QUALITY_TO_INTERVAL_NAMES[quality])
+
+
 def chord_name_to_note_names(chord: str) -> list[str]:
     """
     Return the note names to play the specified `chord`.

@@ -1,7 +1,11 @@
 import argparse
 import sys
 
-from pyguitar.chords import chord_name_to_note_names, chord_name_to_pitches
+from pyguitar.chords import (
+    chord_name_to_interval_names,
+    chord_name_to_note_names,
+    chord_name_to_pitches,
+)
 from pyguitar.guitar import Cell, Fretboard, Orientation
 from pyguitar.notes import key_name_to_note_names, key_name_to_pitches
 
@@ -91,7 +95,14 @@ def main() -> None:
         )
 
     else:
+        note_functions = chord_name_to_interval_names(options.chord)
+        note_names = chord_name_to_note_names(options.chord)
         note_values = [i % 12 for i in chord_name_to_pitches(options.chord)]
+
+        # Display note names.
+        for function, name in zip(note_functions, note_names):
+            sys.stdout.write(f"{function} = {name}\n")
+
         plot_notes(
             basename=f"chord-{options.chord}",
             note_values=note_values,
