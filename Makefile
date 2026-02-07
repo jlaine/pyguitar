@@ -5,7 +5,7 @@ all:
 lint:
 	ruff check .
 	ruff format --check --diff .
-	mypy scripts src tests
+	mypy examples src tests
 
 test:
 	coverage erase
