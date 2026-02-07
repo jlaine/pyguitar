@@ -24,6 +24,7 @@ def plot_notes(
 ) -> None:
     # Place notes on fretboard.
     board = Fretboard()
+    note_values = [i % 12 for i in note_values]
     for pos, note_value in board.walk():
         try:
             idx = note_values.index(note_value % 12)
@@ -44,7 +45,16 @@ def plot_notes(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Display notes on a guitar")
-    parser.add_argument("--portrait", action="store_true")
+    parser.add_argument(
+        "--note-names",
+        action="store_true",
+        help="Show note names instead of their function.",
+    )
+    parser.add_argument(
+        "--portrait",
+        action="store_true",
+        help="Show the fretboard in portrait mode.",
+    )
 
     subparsers = parser.add_subparsers(
         dest="command", required=True, help="The command to run."
@@ -81,6 +91,7 @@ def main() -> None:
             key_type = "minor"
         note_indexes = [DIATONIC_NOTE_FUNCTIONS.index(n) for n in note_functions]
         note_names = [names[i] for i in note_indexes]
+        note_values = [pitches[i] for i in note_indexes]
 
         # Display note names.
         for function, name in zip(note_functions, note_names):
@@ -89,25 +100,25 @@ def main() -> None:
         plot_notes(
             basename=f"{scale_type}-{options.key.lower()}-{key_type}",
             note_colors=[SCALE_NOTE_COLORS[i] for i in note_indexes],
-            note_texts=note_functions,
-            note_values=[pitches[i] % 12 for i in note_indexes],
+            note_texts=note_names if options.note_names else note_functions,
+            note_values=note_values,
             orientation=orientation,
         )
 
     else:
         note_functions = chord_name_to_interval_names(options.chord)
         note_names = chord_name_to_note_names(options.chord)
-        note_values = [i % 12 for i in chord_name_to_pitches(options.chord)]
+        note_values = chord_name_to_pitches(options.chord)
 
         # Display note names.
         for function, name in zip(note_functions, note_names):
-            sys.stdout.write(f"{function} = {name}\n")
+            sys.stdout.write(f"{function:3} = {name}\n")
 
         plot_notes(
             basename=f"chord-{options.chord}",
-            note_values=note_values,
             note_colors=[SCALE_NOTE_COLORS[i] for i in range(len(note_values))],
-            note_texts=chord_name_to_note_names(options.chord),
+            note_texts=note_names if options.note_names else note_functions,
+            note_values=note_values,
             orientation=orientation,
         )
 
