@@ -36,6 +36,7 @@ CHORD_QUALITY_TO_INTERVAL_NAMES = {
     "aug7": ("1", "3", "#5", "b7"),  # augmented seventh
     "augmaj7": ("1", "3", "#5", "7"),  # augmented major seventh
     "dim7": ("1", "b3", "b5", "bb7"),  # diminished seventh
+    "dimmaj7": ("1", "b3", "b5", "7"),  # diminished major seventh
     # ninth chords
     "9": ("1", "3", "5", "b7", "9"),  # dominant ninth
     "maj9": ("1", "3", "5", "7", "9"),  # major ninth
