@@ -43,7 +43,7 @@ def plot_notes(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Play with notes")
+    parser = argparse.ArgumentParser(description="Display notes on a guitar")
     parser.add_argument("--portrait", action="store_true")
 
     subparsers = parser.add_subparsers(
