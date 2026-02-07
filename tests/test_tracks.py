@@ -8,7 +8,7 @@ from pyguitar.tracks import Track, TrackNote
 
 
 class TracksTest(unittest.TestCase):
-    def test_add_notes(self) -> Track:
+    def test_add_notes(self) -> None:
         track = Track(beats_per_minute=100)
         track.add_notes([48], duration=Fraction(1, 4))
         self.assertEqual(
@@ -17,10 +17,10 @@ class TracksTest(unittest.TestCase):
                 [TrackNote(duration=Fraction(1, 4), pitch=48)],
             ],
         )
-        return track
 
     def test_to_midi(self) -> None:
-        track = self.test_add_notes()
+        track = Track(beats_per_minute=100)
+        track.add_notes([48], duration=Fraction(1, 4))
         buffer = io.BytesIO()
 
         midi_file = mido.MidiFile()
