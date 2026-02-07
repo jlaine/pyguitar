@@ -86,6 +86,7 @@ class ChordsTest(unittest.TestCase):
             "Caug7": ["C", "E", "G#", "Bb"],
             "Caugmaj7": ["C", "E", "G#", "B"],
             "Cdim7": ["C", "Eb", "Gb", "Bbb"],
+            "Cdimmaj7": ["C", "Eb", "Gb", "B"],
             # ninth chords
             "C9": ["C", "E", "G", "Bb", "D"],
             "Cmaj9": ["C", "E", "G", "B", "D"],
