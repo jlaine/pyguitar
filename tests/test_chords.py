@@ -64,20 +64,18 @@ class ChordsTest(unittest.TestCase):
 
     def test_chord_name_to_description(self) -> None:
         chords = {
-            "C/B": "C major triad over B",
-            # triads
+            # 3 notes
             "C": "C major triad",
             "Cm": "C minor triad",
             "Caug": "C augmented triad",
             "Cdim": "C diminished triad",
-            # suspended chords
             "Csus2": "C suspended second",
             "Csus4": "C suspended fourth",
-            # sixth chords
+            # 4 notes
             "C6": "C major sixth",
             "Cm6": "C minor sixth",
-            # seventh chords
             "C7": "C dominant seventh",
+            "C7b5": "C dominant seventh flat five",
             "Cmaj7": "C major seventh",
             "Cm7": "C minor seventh",
             "Cm7b5": "C minor seventh flat five",
@@ -86,11 +84,13 @@ class ChordsTest(unittest.TestCase):
             "Caugmaj7": "C augmented major seventh",
             "Cdim7": "C diminished seventh",
             "Cdimmaj7": "C diminished major seventh",
-            # ninth chords,
+            # 5 notes
             "C9": "C dominant ninth",
             "Cmaj9": "C major ninth",
             "Cm9": "C minor ninth",
             "C7b9": "C dominant seventh flat nine",
+            # other
+            "C/B": "C major triad over B",
         }
         for name, description in chords.items():
             with self.subTest(name=name):
@@ -101,19 +101,18 @@ class ChordsTest(unittest.TestCase):
 
     def test_chord_name_to_note_names(self) -> None:
         chords = {
-            # triads
+            # 3 notes
             "C": ["C", "E", "G"],
             "Cm": ["C", "Eb", "G"],
             "Caug": ["C", "E", "G#"],
             "Cdim": ["C", "Eb", "Gb"],
-            # suspended chords
             "Csus2": ["C", "D", "G"],
             "Csus4": ["C", "F", "G"],
-            # sixth chords
+            # 4 notes
             "C6": ["C", "E", "G", "A"],
             "Cm6": ["C", "Eb", "G", "A"],
-            # seventh chords
             "C7": ["C", "E", "G", "Bb"],
+            "C7b5": ["C", "E", "Gb", "Bb"],
             "Cmaj7": ["C", "E", "G", "B"],
             "Cm7": ["C", "Eb", "G", "Bb"],
             "Cm7b5": ["C", "Eb", "Gb", "Bb"],
@@ -122,7 +121,7 @@ class ChordsTest(unittest.TestCase):
             "Caugmaj7": ["C", "E", "G#", "B"],
             "Cdim7": ["C", "Eb", "Gb", "Bbb"],
             "Cdimmaj7": ["C", "Eb", "Gb", "B"],
-            # ninth chords
+            # 5 notes
             "C9": ["C", "E", "G", "Bb", "D"],
             "Cmaj9": ["C", "E", "G", "B", "D"],
             "Cm9": ["C", "Eb", "G", "Bb", "D"],

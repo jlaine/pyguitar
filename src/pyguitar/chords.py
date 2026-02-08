@@ -32,19 +32,18 @@ class Quality:
 CHORD_QUALITIES = {
     quality.notation: quality
     for quality in [
-        # triads
+        # 3 notes
         Quality("", ("1", "3", "5"), "major triad"),
         Quality("m", ("1", "b3", "5"), "minor triad"),
         Quality("aug", ("1", "3", "#5"), "augmented triad"),
         Quality("dim", ("1", "b3", "b5"), "diminished triad"),
-        # suspended chords
         Quality("sus2", ("1", "2", "5"), "suspended second"),
         Quality("sus4", ("1", "4", "5"), "suspended fourth"),
-        # sixth chords
+        # 4 notes
         Quality("6", ("1", "3", "5", "6"), "major sixth"),
         Quality("m6", ("1", "b3", "5", "6"), "minor sixth"),
-        # seventh chords
         Quality("7", ("1", "3", "5", "b7"), "dominant seventh"),
+        Quality("7b5", ("1", "3", "b5", "b7"), "dominant seventh flat five"),
         Quality("maj7", ("1", "3", "5", "7"), "major seventh"),
         Quality("m7", ("1", "b3", "5", "b7"), "minor seventh"),
         Quality("m7b5", ("1", "b3", "b5", "b7"), "minor seventh flat five"),
@@ -53,7 +52,7 @@ CHORD_QUALITIES = {
         Quality("augmaj7", ("1", "3", "#5", "7"), "augmented major seventh"),
         Quality("dim7", ("1", "b3", "b5", "bb7"), "diminished seventh"),
         Quality("dimmaj7", ("1", "b3", "b5", "7"), "diminished major seventh"),
-        # ninth chords
+        # 5 notes
         Quality("9", ("1", "3", "5", "b7", "9"), "dominant ninth"),
         Quality("maj9", ("1", "3", "5", "7", "9"), "major ninth"),
         Quality("m9", ("1", "b3", "5", "b7", "9"), "minor ninth"),
