@@ -29,22 +29,17 @@ class Note:
 
 
 NOTE_ALPHABET = ["C", "D", "E", "F", "G", "A", "B"]
-NOTE_NAMES = (
-    ("C", "B#"),  # major/minor scale cannot start with B#
-    ("C#", "Db"),  # minor scale cannot start with Db
-    ("D",),
-    ("Eb", "D#"),  # major scale cannot start with D#
-    ("E", "Fb"),  # major/minor scale cannot start with Fb
-    ("F", "E#"),  # major/minor scale cannot start with E#
-    ("F#", "Gb"),  # minor scale cannot start with Gb
-    ("G",),
-    ("Ab", "G#"),  # major scale cannot start with G#
-    ("A",),
-    ("Bb", "A#"),  # major scale cannot start with A#
-    ("B", "Cb"),  # minor scale cannot start with Cb
-)
 NOTE_NAMES_SHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 NOTE_NAMES_FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
+NOTE_PITCHES = {
+    "C": 0,
+    "D": 2,
+    "E": 4,
+    "F": 5,
+    "G": 7,
+    "A": 9,
+    "B": 11,
+}
 
 # Roman numerals.
 ROMAN_NUMERALS_LOWER = ["i", "ii", "iii", "iv", "v", "vi", "vii"]
@@ -59,7 +54,7 @@ MINOR_SCALE_ROMAN = ("i", "iidim", "III", "iv", "v", "VI", "VII")
 
 # Circle of fifths.
 KEYS = [
-    ("Cb", None),
+    ("Cb", "ab"),
     ("Gb", "eb"),
     ("Db", "bb"),
     ("Ab", "f"),
@@ -73,7 +68,7 @@ KEYS = [
     ("E", "c#"),
     ("B", "g#"),
     ("F#", "d#"),
-    ("C#", None),
+    ("C#", "a#"),
 ]
 KEY_INDEXES = [(f + 7) % len(KEYS) for f in range(len(KEYS))]
 KEY_SIGNATURES = {}
@@ -104,27 +99,34 @@ def build_note_names(key: str) -> list[str]:
     note_index = NOTE_ALPHABET.index(root_name[0])
     offsets = MINOR_SCALE if key.islower() else MAJOR_SCALE
 
-    # Name notes in the key.
-    all_note_names = 12 * [""]
-    all_note_names[root_pitch % 12] = root_name
-    for offset in offsets[1:]:
-        note = root_pitch + offset
-        note_index = (note_index + 1) % 7
-        for name in NOTE_NAMES[note % 12]:
-            if name[0] == NOTE_ALPHABET[note_index]:
-                all_note_names[note % 12] = name
-                break
-        else:
-            raise ValueError("Scale cannot start with %s" % root_name)
-
-    # Fill the gaps.
-    if KEY_SIGNATURES[key] < 0:
+    if KEY_SIGNATURES.get(key, 0) < 0 or len(key) > 1 and key[1] == "b":
+        alter = diminish
         note_alphabet = NOTE_NAMES_FLAT
     else:
+        alter = augment
         note_alphabet = NOTE_NAMES_SHARP
-    for note, val in enumerate(all_note_names):
+
+    # Name notes in the key.
+    all_note_names = [""] * 12
+    all_note_names[root_pitch % 12] = root_name
+    for offset in offsets[1:]:
+        note_index = (note_index + 1) % 7
+        note_pitch = (root_pitch + offset) % 12
+
+        # Find the accidental to match the pitch.
+        note_name = NOTE_ALPHABET[note_index]
+        for i in range(3):
+            if note_name_to_pitch(note_name) == note_pitch:
+                all_note_names[note_pitch % 12] = note_name
+                break
+            note_name = alter(note_name)
+        else:
+            raise ValueError(f"Scale {key} requires too many accidentals")
+
+    # Fill the gaps.
+    for note_pitch, val in enumerate(all_note_names):
         if not val:
-            all_note_names[note] = note_alphabet[note]
+            all_note_names[note_pitch] = note_alphabet[note_pitch]
 
     return all_note_names
 
@@ -192,10 +194,16 @@ def note_name_to_pitch(note: str) -> int:
     """
     Return the pitch to play the specified `note`.
     """
-    for value, names in enumerate(NOTE_NAMES):
-        if note in names:
-            return value
-    raise ValueError("Unknown note %s" % note)
+    try:
+        pitch = NOTE_PITCHES[note[0]]
+    except KeyError:
+        raise ValueError("Unknown note %s" % note)
+    for alteration in note[1:]:
+        if alteration == "b":
+            pitch -= 1
+        else:
+            pitch += 1
+    return pitch % 12
 
 
 def parse_note_alteration(note: str) -> tuple[str, str]:
@@ -216,4 +224,6 @@ def prettify_key(key: str) -> str:
 
 
 def prettify_note(note: str) -> str:
-    return note.replace("b", "♭").replace("#", "♯")
+    return (
+        note.replace("bb", "𝄫").replace("##", "𝄪").replace("b", "♭").replace("#", "♯")
+    )
