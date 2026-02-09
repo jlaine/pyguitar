@@ -87,11 +87,6 @@ def shift(root: int, pitches: Sequence[int]) -> list[int]:
     return [root + x for x in pitches]
 
 
-def unshift(notes: Sequence[int]) -> tuple[int, list[int]]:
-    root = notes[0]
-    return root, [x - root for x in notes]
-
-
 @functools.lru_cache()
 def build_note_names(key: str) -> list[str]:
     root_name = key_root_name(key)
