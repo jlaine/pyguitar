@@ -23,6 +23,7 @@ class NotesTest(unittest.TestCase):
         self.assertEqual(diminish("C#"), "C")
 
     def test_key_name_to_note_names(self) -> None:
+        # Valid scales.
         keys = {
             # Major scales.
             "Cb": ["Cb", "Db", "Eb", "Fb", "Gb", "Ab", "Bb"],
@@ -40,6 +41,13 @@ class NotesTest(unittest.TestCase):
             "B": ["B", "C#", "D#", "E", "F#", "G#", "A#"],
             "F#": ["F#", "G#", "A#", "B", "C#", "D#", "E#"],
             "C#": ["C#", "D#", "E#", "F#", "G#", "A#", "B#"],
+            # Major scales (theoretical).
+            "A#": ["A#", "B#", "C##", "D#", "E#", "F##", "G##"],
+            "B#": ["B#", "C##", "D##", "E#", "F##", "G##", "A##"],
+            "D#": ["D#", "E#", "F##", "G#", "A#", "B#", "C##"],
+            "E#": ["E#", "F##", "G##", "A#", "B#", "C##", "D##"],
+            "Fb": ["Fb", "Gb", "Ab", "Bbb", "Cb", "Db", "Eb"],
+            "G#": ["G#", "A#", "B#", "C#", "D#", "E#", "F##"],
             # Minor scales.
             "eb": ["Eb", "F", "Gb", "Ab", "Bb", "Cb", "Db"],
             "bb": ["Bb", "C", "Db", "Eb", "F", "Gb", "Ab"],
@@ -54,15 +62,41 @@ class NotesTest(unittest.TestCase):
             "c#": ["C#", "D#", "E", "F#", "G#", "A", "B"],
             "g#": ["G#", "A#", "B", "C#", "D#", "E", "F#"],
             "d#": ["D#", "E#", "F#", "G#", "A#", "B", "C#"],
+            # Minor scales (theoretical).
+            "b#": ["B#", "C##", "D#", "E#", "F##", "G#", "A#"],
+            "cb": ["Cb", "Db", "Ebb", "Fb", "Gb", "Abb", "Bbb"],
+            "db": ["Db", "Eb", "Fb", "Gb", "Ab", "Bbb", "Cb"],
+            "e#": ["E#", "F##", "G#", "A#", "B#", "C#", "D#"],
+            "fb": ["Fb", "Gb", "Abb", "Bbb", "Cb", "Dbb", "Ebb"],
+            "gb": ["Gb", "Ab", "Bbb", "Cb", "Db", "Ebb", "Fb"],
         }
         for key, names in keys.items():
             with self.subTest(key=key):
                 self.assertEqual(key_name_to_note_names(key), names)
 
-        # Invalid scale.
-        with self.assertRaises(ValueError) as cm:
-            key_name_to_note_names("B#")
-        self.assertEqual(str(cm.exception), "Scale cannot start with B#")
+        # Invalid scales.
+        for key in [
+            # Major scales.
+            "A##",
+            "B##",
+            "D##",
+            "E##",
+            "Fbb",
+            "G##",
+            # Minor scales.
+            "b##",
+            "cbb",
+            "dbb",
+            "e##",
+            "fbb",
+            "gbb",
+        ]:
+            with self.subTest(key=key):
+                with self.assertRaises(ValueError) as cm:
+                    key_name_to_note_names(key)
+                self.assertEqual(
+                    str(cm.exception), f"Scale {key} requires too many accidentals"
+                )
 
     def test_note_name_from_roman(self) -> None:
         notes = {
@@ -134,7 +168,9 @@ class NotesTest(unittest.TestCase):
         notes = {
             "C": "C",
             "Cb": "C♭",
+            "Cbb": "C𝄫",
             "C#": "C♯",
+            "C##": "C𝄪",
         }
         for plain, pretty in notes.items():
             with self.subTest(plain=plain):
