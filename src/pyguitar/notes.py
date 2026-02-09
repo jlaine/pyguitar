@@ -1,5 +1,5 @@
 import functools
-from typing import Sequence, cast
+from typing import Sequence
 
 
 class Note:
@@ -29,8 +29,6 @@ class Note:
 
 
 NOTE_ALPHABET = ["C", "D", "E", "F", "G", "A", "B"]
-NOTE_NAMES_SHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-NOTE_NAMES_FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
 NOTE_PITCHES = {
     "C": 0,
     "D": 2,
@@ -70,17 +68,12 @@ KEYS = [
     ("F#", "d#"),
     ("C#", "a#"),
 ]
-KEY_INDEXES = [(f + 7) % len(KEYS) for f in range(len(KEYS))]
-KEY_SIGNATURES = {}
-MAJOR_KEYS = [KEYS[i][0] for i in KEY_INDEXES if KEYS[i][0] is not None]
-MINOR_KEYS = cast(
-    list[str], [KEYS[i][1] for i in KEY_INDEXES if KEYS[i][1] is not None]
-)  # mypy does not detect this list will only contain strings.
+MAJOR_KEYS = [k[0] for k in KEYS]
+MINOR_KEYS = [k[1] for k in KEYS]
+KEY_SIGNATURES: dict[str, int] = {}
 for idx, (major, minor) in enumerate(KEYS):
-    if major is not None:
-        KEY_SIGNATURES[major] = idx - 7
-    if minor is not None:
-        KEY_SIGNATURES[minor] = idx - 7
+    KEY_SIGNATURES[major] = idx - 7
+    KEY_SIGNATURES[minor] = idx - 7
 
 
 def shift(root: int, pitches: Sequence[int]) -> list[int]:
