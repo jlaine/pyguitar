@@ -9,12 +9,10 @@ from pyguitar.notes import (
     augment,
     diminish,
     key_name_to_note_names,
-    note_name_from_pitch,
     note_name_from_roman,
     note_name_to_pitch,
     parse_note_alteration,
     shift,
-    unshift,
 )
 
 
@@ -108,29 +106,6 @@ def _parse_chord_name(name: str, alphabet: list[str]) -> tuple[str, Quality, str
     quality = CHORD_QUALITIES[m.group(2)]
     over = m.group(3)
     return root, quality, over
-
-
-def chord_name_from_pitches(pitches: list[int], key: str) -> str:
-    """
-    Return a chord name for the given `pitches` in the specified `key`.
-    """
-    qualities_by_offsets = {
-        tuple(quality.pitches): quality for quality in CHORD_QUALITIES.values()
-    }
-
-    try:
-        root, offsets = unshift(pitches)
-        quality = qualities_by_offsets[tuple(offsets)]
-        return note_name_from_pitch(root, key) + quality.notation
-    except KeyError:
-        root, offsets = unshift(pitches[1:])
-        quality = qualities_by_offsets[tuple(offsets)]
-        return (
-            note_name_from_pitch(root, key)
-            + quality.notation
-            + "/"
-            + note_name_from_pitch(pitches[0], key)
-        )
 
 
 def chord_name_from_roman(roman: str, key: str) -> str:

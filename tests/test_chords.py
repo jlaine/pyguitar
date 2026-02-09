@@ -1,7 +1,6 @@
 import unittest
 
 from pyguitar.chords import (
-    chord_name_from_pitches,
     chord_name_from_roman,
     chord_name_to_description,
     chord_name_to_interval_names,
@@ -137,20 +136,29 @@ class ChordsTest(unittest.TestCase):
 
     def test_chord_name_to_pitches(self) -> None:
         chords = {
-            "D/C": [0, 2, 6, 9],
-            "C/B": [-1, 0, 4, 7],
+            # 3 notes
             "C": [0, 4, 7],
             "Cm": [0, 3, 7],
+            "Caug": [0, 4, 8],
             "Cdim": [0, 3, 6],
+            # 4 notes
             "C6": [0, 4, 7, 9],
-            "C7": [0, 4, 7, 10],
-            "Cmaj7": [0, 4, 7, 11],
             "Cm6": [0, 3, 7, 9],
+            "C7": [0, 4, 7, 10],
+            "C7b5": [0, 4, 6, 10],
+            "Cmaj7": [0, 4, 7, 11],
             "Cm7": [0, 3, 7, 10],
+            "Cm7b5": [0, 3, 6, 10],
+            "Cmmaj7": [0, 3, 7, 11],
+            "Caug7": [0, 4, 8, 10],
+            "Caugmaj7": [0, 4, 8, 11],
             "Cdim7": [0, 3, 6, 9],
+            "Cdimmaj7": [0, 3, 6, 11],
+            # other
+            "D/C": [0, 2, 6, 9],
+            "C/B": [-1, 0, 4, 7],
         }
         key = "C"
         for name, pitches in chords.items():
             with self.subTest(name=name, key=key):
                 self.assertEqual(chord_name_to_pitches(name), pitches)
-                self.assertEqual(chord_name_from_pitches(pitches, key), name)
