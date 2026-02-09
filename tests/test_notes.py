@@ -4,7 +4,7 @@ from pyguitar.notes import (
     augment,
     diminish,
     key_name_to_note_names,
-    note_name_from_pitch,
+    key_name_to_pitches,
     note_name_from_roman,
     note_name_to_pitch,
     prettify_chord,
@@ -98,6 +98,15 @@ class NotesTest(unittest.TestCase):
                     str(cm.exception), f"Scale {key} requires too many accidentals"
                 )
 
+    def test_key_name_to_pitches(self) -> None:
+        keys = {
+            "C": [0, 2, 4, 5, 7, 9, 11],
+            "c": [0, 2, 3, 5, 7, 8, 10],
+        }
+        for key, pitches in keys.items():
+            with self.subTest(key=key):
+                self.assertEqual(key_name_to_pitches(key), pitches)
+
     def test_note_name_from_roman(self) -> None:
         notes = {
             "I": "C",
@@ -133,7 +142,6 @@ class NotesTest(unittest.TestCase):
         for name, pitch in notes.items():
             with self.subTest(name=name, key=key):
                 self.assertEqual(note_name_to_pitch(name), pitch)
-                self.assertEqual(note_name_from_pitch(pitch, key), name)
 
         with self.assertRaises(ValueError):
             note_name_to_pitch("X")

@@ -87,45 +87,6 @@ def shift(root: int, pitches: Sequence[int]) -> list[int]:
     return [root + x for x in pitches]
 
 
-@functools.lru_cache()
-def build_note_names(key: str) -> list[str]:
-    root_name = key_root_name(key)
-    root_pitch = note_name_to_pitch(root_name)
-    note_index = NOTE_ALPHABET.index(root_name[0])
-    offsets = MINOR_SCALE if key.islower() else MAJOR_SCALE
-
-    if KEY_SIGNATURES.get(key, 0) < 0 or len(key) > 1 and key[1] == "b":
-        alter = diminish
-        note_alphabet = NOTE_NAMES_FLAT
-    else:
-        alter = augment
-        note_alphabet = NOTE_NAMES_SHARP
-
-    # Name notes in the key.
-    all_note_names = [""] * 12
-    all_note_names[root_pitch % 12] = root_name
-    for offset in offsets[1:]:
-        note_index = (note_index + 1) % 7
-        note_pitch = (root_pitch + offset) % 12
-
-        # Find the accidental to match the pitch.
-        note_name = NOTE_ALPHABET[note_index]
-        for i in range(3):
-            if note_name_to_pitch(note_name) == note_pitch:
-                all_note_names[note_pitch % 12] = note_name
-                break
-            note_name = alter(note_name)
-        else:
-            raise ValueError(f"Scale {key} requires too many accidentals")
-
-    # Fill the gaps.
-    for note_pitch, val in enumerate(all_note_names):
-        if not val:
-            all_note_names[note_pitch] = note_alphabet[note_pitch]
-
-    return all_note_names
-
-
 def augment(note: str) -> str:
     """
     Augment the given note.
@@ -146,33 +107,49 @@ def diminish(note: str) -> str:
         return note + "b"
 
 
+@functools.lru_cache()
 def key_name_to_note_names(key: str) -> list[str]:
     """
     Return the list of note names in the given `key`.
     """
-    return [note_name_from_pitch(p, key) for p in key_name_to_pitches(key)]
+    root_name = key_root_name(key)
+    root_pitch = note_name_to_pitch(root_name)
+    note_index = NOTE_ALPHABET.index(root_name[0])
+    offsets = MINOR_SCALE if key.islower() else MAJOR_SCALE
+
+    if KEY_SIGNATURES.get(key, 0) < 0 or len(key) > 1 and key[1] == "b":
+        alter = diminish
+    else:
+        alter = augment
+
+    # Name notes in the key.
+    note_names = [root_name]
+    for offset in offsets[1:]:
+        note_index = (note_index + 1) % 7
+        note_pitch = (root_pitch + offset) % 12
+
+        # Find the accidental to match the pitch.
+        note_name = NOTE_ALPHABET[note_index]
+        for i in range(3):
+            if note_name_to_pitch(note_name) == note_pitch:
+                note_names.append(note_name)
+                break
+            note_name = alter(note_name)
+        else:
+            raise ValueError(f"Scale {key} requires too many accidentals")
+
+    return note_names
 
 
 def key_name_to_pitches(key: str) -> list[int]:
     """
     Return the list of pitches in the given `key`.
     """
-    root_name = key_root_name(key)
-    root_pitch = note_name_to_pitch(root_name)
-    minor = key.islower()
-    return shift(root_pitch, MINOR_SCALE if minor else MAJOR_SCALE)
+    return [note_name_to_pitch(name) for name in key_name_to_note_names(key)]
 
 
 def key_root_name(key: str) -> str:
     return key[0].upper() + key[1:]
-
-
-def note_name_from_pitch(pitch: int, key: str) -> str:
-    """
-    Return the note name for the given `pitch` in the specified `key`.
-    """
-    note_names = build_note_names(key)
-    return note_names[pitch % 12]
 
 
 def note_name_from_roman(roman: str, key: str) -> str:
