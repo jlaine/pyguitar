@@ -83,6 +83,10 @@ class ChordsTest(unittest.TestCase):
             "Caugmaj7": "C augmented major seventh",
             "Cdim7": "C diminished seventh",
             "Cdimmaj7": "C diminished major seventh",
+            "Cadd4": "C major add fourth",
+            "Cmadd4": "C minor add fourth",
+            "Cadd9": "C major add ninth",
+            "Cmadd9": "C minor add ninth",
             # 5 notes
             "C9": "C dominant ninth",
             "Cmaj9": "C major ninth",
@@ -125,6 +129,10 @@ class ChordsTest(unittest.TestCase):
             "Caugmaj7": ["C", "E", "G#", "B"],
             "Cdim7": ["C", "Eb", "Gb", "Bbb"],
             "Cdimmaj7": ["C", "Eb", "Gb", "B"],
+            "Cadd4": ["C", "E", "F", "G"],
+            "Cmadd4": ["C", "Eb", "F", "G"],
+            "Cadd9": ["C", "E", "F", "D"],
+            "Cmadd9": ["C", "Eb", "F", "D"],
             # 5 notes
             "C9": ["C", "E", "G", "Bb", "D"],
             "Cmaj9": ["C", "E", "G", "B", "D"],
@@ -170,6 +178,10 @@ class ChordsTest(unittest.TestCase):
             "Caugmaj7": [0, 4, 8, 11],
             "Cdim7": [0, 3, 6, 9],
             "Cdimmaj7": [0, 3, 6, 11],
+            "Cadd4": [0, 4, 5, 7],
+            "Cmadd4": [0, 3, 5, 7],
+            "Cadd9": [0, 4, 5, 14],
+            "Cmadd9": [0, 3, 5, 14],
             # 5 notes
             "C9": [0, 4, 7, 10, 14],
             "Cmaj9": [0, 4, 7, 11, 14],
