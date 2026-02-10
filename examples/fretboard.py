@@ -39,9 +39,6 @@ def plot_notes(
     with open(basename + ".svg", "w") as fp:
         fp.write(board.dump_svg(orientation=orientation))
 
-    with open(basename + ".pdf", "wb") as fp:
-        fp.write(board.dump_pdf(orientation=orientation))
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Display notes on a guitar")
