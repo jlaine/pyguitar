@@ -2,7 +2,7 @@ import dataclasses
 import functools
 import re
 
-from pyguitar.notes import (
+from pyfrets.notes import (
     MAJOR_SCALE,
     NOTE_ALPHABET,
     ROMAN_ALPHABET,
