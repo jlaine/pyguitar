@@ -8,6 +8,7 @@ from pyfrets.notes import (
     note_name_from_roman,
     note_name_to_pitch,
     prettify_chord,
+    prettify_interval,
     prettify_key,
     prettify_note,
 )
@@ -158,6 +159,17 @@ class NotesTest(unittest.TestCase):
         for plain, pretty in notes.items():
             with self.subTest(plain=plain):
                 self.assertEqual(prettify_chord(plain), pretty)
+
+    def test_prettify_interval(self) -> None:
+        intervals = {
+            "1": "1",
+            "b3": "♭3",
+            "bb7": "𝄫7",
+            "#5": "♯5",
+        }
+        for plain, pretty in intervals.items():
+            with self.subTest(plain=plain):
+                self.assertEqual(prettify_interval(plain), pretty)
 
     def test_prettify_key(self) -> None:
         notes = {

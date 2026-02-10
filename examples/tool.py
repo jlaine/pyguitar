@@ -36,9 +36,9 @@ def print_key_chords(key: str, romans: Iterable[str]) -> None:
     for chord_roman in romans:
         chord_name = chord_name_from_roman(chord_roman, key)
         print(
-            "%-5s %-4s : %s"
+            "%-6s %-6s : %s"
             % (
-                chord_roman,
+                prettify_chord(chord_roman),
                 prettify_chord(chord_name),
                 " ".join(
                     [
@@ -48,6 +48,7 @@ def print_key_chords(key: str, romans: Iterable[str]) -> None:
                 ),
             )
         )
+    print()
 
 
 def print_song_info(song: Song) -> None:
@@ -59,12 +60,14 @@ def print_song_info(song: Song) -> None:
     # Print chord pattern.
     print_key_chords(song.key, set(chord_pattern_roman))
     print("== chord pattern ==")
-    print(" ".join("%-3s" % x for x in chord_pattern_roman))
-    print(" ".join("%-3s" % x for x in chord_pattern_name))
+    print(" ".join("%-6s" % prettify_chord(x) for x in chord_pattern_roman))
+    print(" ".join("%-6s" % prettify_chord(x) for x in chord_pattern_name))
+    print()
 
     # Print strumming pattern.
     print("== strumming pattern ==")
     print(song.strum_pattern)
+    print()
 
 
 def strum_song(*, repeat: int, song: Song) -> Track:

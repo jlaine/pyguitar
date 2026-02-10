@@ -7,7 +7,12 @@ from pyfrets.chords import (
     chord_name_to_pitches,
 )
 from pyfrets.guitar import Cell, Fretboard, Orientation
-from pyfrets.notes import key_name_to_note_names, key_name_to_pitches
+from pyfrets.notes import (
+    key_name_to_note_names,
+    key_name_to_pitches,
+    prettify_interval,
+    prettify_note,
+)
 
 SCALE_NOTE_COLORS = ["red", "black", "green", "magenta", "blue", "black", "magenta"]
 DIATONIC_NOTE_FUNCTIONS = ["R", "2", "3", "4", "5", "6", "7"]
@@ -87,7 +92,7 @@ def main() -> None:
         else:
             key_type = "minor"
         note_indexes = [DIATONIC_NOTE_FUNCTIONS.index(n) for n in note_functions]
-        note_names = [names[i] for i in note_indexes]
+        note_names = [prettify_interval(names[i]) for i in note_indexes]
         note_values = [pitches[i] for i in note_indexes]
 
         # Display note names.
@@ -103,8 +108,10 @@ def main() -> None:
         )
 
     else:
-        note_functions = chord_name_to_interval_names(options.chord)
-        note_names = chord_name_to_note_names(options.chord)
+        note_functions = [
+            prettify_interval(i) for i in chord_name_to_interval_names(options.chord)
+        ]
+        note_names = [prettify_note(n) for n in chord_name_to_note_names(options.chord)]
         note_values = chord_name_to_pitches(options.chord)
 
         # Display note names.

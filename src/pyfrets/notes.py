@@ -183,6 +183,10 @@ def prettify_chord(chord: str) -> str:
     return prettify_note(chord).replace("dim", "°")
 
 
+def prettify_interval(interval: str) -> str:
+    return prettify_note(interval)
+
+
 def prettify_key(key: str) -> str:
     kind = "minor" if key.islower() else "major"
     return prettify_note(key_root_name(key)) + " " + kind
