@@ -88,6 +88,11 @@ class ChordsTest(unittest.TestCase):
             "Cmaj9": "C major ninth",
             "Cm9": "C minor ninth",
             "C7b9": "C dominant seventh flat nine",
+            # 6 notes
+            "C11": "C dominant eleventh",
+            "C7#11": "C dominant sharp eleventh",
+            "Cmaj11": "C major eleventh",
+            "Cm11": "C minor eleventh",
             # other
             "C/B": "C major triad over B",
         }
@@ -125,9 +130,16 @@ class ChordsTest(unittest.TestCase):
             "Cmaj9": ["C", "E", "G", "B", "D"],
             "Cm9": ["C", "Eb", "G", "Bb", "D"],
             "C7b9": ["C", "E", "G", "Bb", "Db"],
+            # 6 notes
+            "C11": ["C", "E", "G", "Bb", "D", "F"],
+            "C7#11": ["C", "E", "G", "Bb", "D", "F#"],
+            "Cmaj11": ["C", "E", "G", "B", "D", "F"],
+            "Cm11": ["C", "Eb", "G", "Bb", "D", "F"],
             # other
             "C#": ["C#", "E#", "G#"],
             "C#7": ["C#", "E#", "G#", "B"],
+            "E#": ["E#", "G##", "B#"],
+            "Fbm": ["Fb", "Abb", "Cb"],
             "B/A": ["A", "B", "D#", "F#"],
         }
         for chord, notes in chords.items():
@@ -154,6 +166,16 @@ class ChordsTest(unittest.TestCase):
             "Caugmaj7": [0, 4, 8, 11],
             "Cdim7": [0, 3, 6, 9],
             "Cdimmaj7": [0, 3, 6, 11],
+            # 5 notes
+            "C9": [0, 4, 7, 10, 14],
+            "Cmaj9": [0, 4, 7, 11, 14],
+            "Cm9": [0, 3, 7, 10, 14],
+            "C7b9": [0, 4, 7, 10, 13],
+            # 6 notes
+            "C11": [0, 4, 7, 10, 14, 17],
+            "C7#11": [0, 4, 7, 10, 14, 18],
+            "Cmaj11": [0, 4, 7, 11, 14, 17],
+            "Cm11": [0, 3, 7, 10, 14, 17],
             # other
             "D/C": [0, 2, 6, 9],
             "C/B": [-1, 0, 4, 7],

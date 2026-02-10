@@ -55,6 +55,11 @@ CHORD_QUALITIES = {
         Quality("maj9", ("1", "3", "5", "7", "9"), "major ninth"),
         Quality("m9", ("1", "b3", "5", "b7", "9"), "minor ninth"),
         Quality("7b9", ("1", "3", "5", "b7", "b9"), "dominant seventh flat nine"),
+        # 6 notes
+        Quality("11", ("1", "3", "5", "b7", "9", "11"), "dominant eleventh"),
+        Quality("7#11", ("1", "3", "5", "b7", "9", "#11"), "dominant sharp eleventh"),
+        Quality("maj11", ("1", "3", "5", "7", "9", "11"), "major eleventh"),
+        Quality("m11", ("1", "b3", "5", "b7", "9", "11"), "minor eleventh"),
     ]
 }
 
