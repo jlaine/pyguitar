@@ -1,3 +1,7 @@
+.. image:: docs/_static/pyfrets.png
+   :width: 240px
+   :alt: pyfrets
+
 pyfrets
 =======
 
