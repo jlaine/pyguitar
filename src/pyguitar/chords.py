@@ -50,6 +50,10 @@ CHORD_QUALITIES = {
         Quality("augmaj7", ("1", "3", "#5", "7"), "augmented major seventh"),
         Quality("dim7", ("1", "b3", "b5", "bb7"), "diminished seventh"),
         Quality("dimmaj7", ("1", "b3", "b5", "7"), "diminished major seventh"),
+        Quality("add4", ("1", "3", "4", "5"), "major add fourth"),
+        Quality("madd4", ("1", "b3", "4", "5"), "minor add fourth"),
+        Quality("add9", ("1", "3", "4", "9"), "major add ninth"),
+        Quality("madd9", ("1", "b3", "4", "9"), "minor add ninth"),
         # 5 notes
         Quality("9", ("1", "3", "5", "b7", "9"), "dominant ninth"),
         Quality("maj9", ("1", "3", "5", "7", "9"), "major ninth"),
