@@ -1,12 +1,12 @@
-pyguitar
-========
+pyfrets
+=======
 
-What is ``pyguitar``?
--------------------
+What is ``pyfrets``?
+--------------------
 
-``pyguitar`` is a set of Python tools for guitar players.
+``pyfrets`` is a set of Python tools for guitar players.
 
-``pyguitar`` makes it possible to build scales and chords and to display them
+``pyfrets`` makes it possible to build scales and chords and to display them
 on a guitar fretboard. The fretboard can be rendered as:
 
 - Text with ANSI colours
@@ -34,10 +34,10 @@ G7 chord
 Implementation status
 ---------------------
 
-``pyguitar`` is currently a work in progress. While the command line tools are
+``pyfrets`` is currently a work in progress. While the command line tools are
 functional, the internal APIs are subject to change.
 
 License
 -------
 
-``pyguitar`` is released under the BSD license.
+``pyfrets`` is released under the BSD license.

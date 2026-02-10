@@ -1,6 +1,6 @@
 import unittest
 
-from pyguitar.notes import (
+from pyfrets.notes import (
     augment,
     diminish,
     key_name_to_note_names,

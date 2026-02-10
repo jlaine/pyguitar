@@ -4,7 +4,7 @@ from typing import Iterator, Optional
 
 from colorama import Back, Fore, Style
 
-from pyguitar.notes import Note
+from pyfrets.notes import Note
 
 FRETS = 16
 STRINGS = [Note.E2, Note.A2, Note.D3, Note.G3, Note.B3, Note.E4]

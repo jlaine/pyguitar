@@ -5,12 +5,12 @@ from typing import Iterable
 
 import mido
 
-from pyguitar.chords import (
+from pyfrets.chords import (
     chord_name_from_roman,
     chord_name_to_note_names,
     chord_name_to_pitches,
 )
-from pyguitar.notes import (
+from pyfrets.notes import (
     MAJOR_KEYS,
     MAJOR_SCALE_ROMAN,
     MINOR_KEYS,
@@ -20,7 +20,7 @@ from pyguitar.notes import (
     prettify_key,
     prettify_note,
 )
-from pyguitar.tracks import Track
+from pyfrets.tracks import Track
 
 
 @dataclasses.dataclass

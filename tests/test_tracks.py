@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import mido
 
-from pyguitar.tracks import Track, TrackNote
+from pyfrets.tracks import Track, TrackNote
 
 
 class TracksTest(unittest.TestCase):

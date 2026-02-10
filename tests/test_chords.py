@@ -1,7 +1,7 @@
 import dataclasses
 import unittest
 
-from pyguitar.chords import (
+from pyfrets.chords import (
     chord_name_from_roman,
     chord_name_to_description,
     chord_name_to_interval_names,

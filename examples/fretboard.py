@@ -1,13 +1,13 @@
 import argparse
 import sys
 
-from pyguitar.chords import (
+from pyfrets.chords import (
     chord_name_to_interval_names,
     chord_name_to_note_names,
     chord_name_to_pitches,
 )
-from pyguitar.guitar import Cell, Fretboard, Orientation
-from pyguitar.notes import key_name_to_note_names, key_name_to_pitches
+from pyfrets.guitar import Cell, Fretboard, Orientation
+from pyfrets.notes import key_name_to_note_names, key_name_to_pitches
 
 SCALE_NOTE_COLORS = ["red", "black", "green", "magenta", "blue", "black", "magenta"]
 DIATONIC_NOTE_FUNCTIONS = ["R", "2", "3", "4", "5", "6", "7"]
