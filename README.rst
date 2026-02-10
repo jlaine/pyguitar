@@ -15,7 +15,6 @@ on a guitar fretboard. The fretboard can be rendered as:
 
 - Text with ANSI colours
 - SVG
-- PDF
 
 G major scale
 .............
