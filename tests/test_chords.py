@@ -1,3 +1,4 @@
+import dataclasses
 import unittest
 
 from pyguitar.chords import (
@@ -7,6 +8,13 @@ from pyguitar.chords import (
     chord_name_to_note_names,
     chord_name_to_pitches,
 )
+
+
+@dataclasses.dataclass
+class ChordInfo:
+    description: str
+    notes: list[str]
+    pitches: list[int]
 
 
 class ChordsTest(unittest.TestCase):
@@ -61,142 +69,224 @@ class ChordsTest(unittest.TestCase):
             with self.subTest(roman=roman, key=key):
                 self.assertEqual(chord_name_from_roman(roman, key), name)
 
-    def test_chord_name_to_description(self) -> None:
+    def test_chords(self) -> None:
         chords = {
             # 3 notes
-            "C": "C major triad",
-            "Cm": "C minor triad",
-            "Caug": "C augmented triad",
-            "Cdim": "C diminished triad",
-            "Csus2": "C suspended second",
-            "Csus4": "C suspended fourth",
+            "C": ChordInfo(
+                description="C major triad",
+                notes=["C", "E", "G"],
+                pitches=[0, 4, 7],
+            ),
+            "Cm": ChordInfo(
+                description="C minor triad",
+                notes=["C", "Eb", "G"],
+                pitches=[0, 3, 7],
+            ),
+            "Caug": ChordInfo(
+                description="C augmented triad",
+                notes=["C", "E", "G#"],
+                pitches=[0, 4, 8],
+            ),
+            "Cdim": ChordInfo(
+                description="C diminished triad",
+                notes=["C", "Eb", "Gb"],
+                pitches=[0, 3, 6],
+            ),
+            "Csus2": ChordInfo(
+                description="C suspended second",
+                notes=["C", "D", "G"],
+                pitches=[0, 2, 7],
+            ),
+            "Csus4": ChordInfo(
+                description="C suspended fourth",
+                notes=["C", "F", "G"],
+                pitches=[0, 5, 7],
+            ),
             # 4 notes
-            "C6": "C major sixth",
-            "Cm6": "C minor sixth",
-            "C7": "C dominant seventh",
-            "C7b5": "C dominant seventh flat five",
-            "Cmaj7": "C major seventh",
-            "Cm7": "C minor seventh",
-            "Cm7b5": "C minor seventh flat five",
-            "Cmmaj7": "C minor major seventh",
-            "Caug7": "C augmented seventh",
-            "Caugmaj7": "C augmented major seventh",
-            "Cdim7": "C diminished seventh",
-            "Cdimmaj7": "C diminished major seventh",
-            "Cadd4": "C major add fourth",
-            "Cmadd4": "C minor add fourth",
-            "Cadd9": "C major add ninth",
-            "Cmadd9": "C minor add ninth",
+            "C6": ChordInfo(
+                description="C major sixth",
+                notes=["C", "E", "G", "A"],
+                pitches=[0, 4, 7, 9],
+            ),
+            "Cm6": ChordInfo(
+                description="C minor sixth",
+                notes=["C", "Eb", "G", "A"],
+                pitches=[0, 3, 7, 9],
+            ),
+            "C7": ChordInfo(
+                description="C dominant seventh",
+                notes=["C", "E", "G", "Bb"],
+                pitches=[0, 4, 7, 10],
+            ),
+            "C7b5": ChordInfo(
+                description="C dominant seventh flat five",
+                notes=["C", "E", "Gb", "Bb"],
+                pitches=[0, 4, 6, 10],
+            ),
+            "Cmaj7": ChordInfo(
+                description="C major seventh",
+                notes=["C", "E", "G", "B"],
+                pitches=[0, 4, 7, 11],
+            ),
+            "Cm7": ChordInfo(
+                description="C minor seventh",
+                notes=["C", "Eb", "G", "Bb"],
+                pitches=[0, 3, 7, 10],
+            ),
+            "Cm7b5": ChordInfo(
+                description="C minor seventh flat five",
+                notes=["C", "Eb", "Gb", "Bb"],
+                pitches=[0, 3, 6, 10],
+            ),
+            "Cmmaj7": ChordInfo(
+                description="C minor major seventh",
+                notes=["C", "Eb", "G", "B"],
+                pitches=[0, 3, 7, 11],
+            ),
+            "Caug7": ChordInfo(
+                description="C augmented seventh",
+                notes=["C", "E", "G#", "Bb"],
+                pitches=[0, 4, 8, 10],
+            ),
+            "Caugmaj7": ChordInfo(
+                description="C augmented major seventh",
+                notes=["C", "E", "G#", "B"],
+                pitches=[0, 4, 8, 11],
+            ),
+            "Cdim7": ChordInfo(
+                description="C diminished seventh",
+                notes=["C", "Eb", "Gb", "Bbb"],
+                pitches=[0, 3, 6, 9],
+            ),
+            "Cdimmaj7": ChordInfo(
+                description="C diminished major seventh",
+                notes=["C", "Eb", "Gb", "B"],
+                pitches=[0, 3, 6, 11],
+            ),
+            "Cadd4": ChordInfo(
+                description="C major add fourth",
+                notes=["C", "E", "F", "G"],
+                pitches=[0, 4, 5, 7],
+            ),
+            "Cmadd4": ChordInfo(
+                description="C minor add fourth",
+                notes=["C", "Eb", "F", "G"],
+                pitches=[0, 3, 5, 7],
+            ),
+            "Cadd9": ChordInfo(
+                description="C major add ninth",
+                notes=["C", "E", "F", "D"],
+                pitches=[0, 4, 5, 14],
+            ),
+            "Cmadd9": ChordInfo(
+                description="C minor add ninth",
+                notes=["C", "Eb", "F", "D"],
+                pitches=[0, 3, 5, 14],
+            ),
             # 5 notes
-            "C9": "C dominant ninth",
-            "Cmaj9": "C major ninth",
-            "Cm9": "C minor ninth",
-            "C7b9": "C dominant seventh flat nine",
+            "C9": ChordInfo(
+                description="C dominant ninth",
+                notes=["C", "E", "G", "Bb", "D"],
+                pitches=[0, 4, 7, 10, 14],
+            ),
+            "Cmaj9": ChordInfo(
+                description="C major ninth",
+                notes=["C", "E", "G", "B", "D"],
+                pitches=[0, 4, 7, 11, 14],
+            ),
+            "Cm9": ChordInfo(
+                description="C minor ninth",
+                notes=["C", "Eb", "G", "Bb", "D"],
+                pitches=[0, 3, 7, 10, 14],
+            ),
+            "C7b9": ChordInfo(
+                description="C dominant seventh flat nine",
+                notes=["C", "E", "G", "Bb", "Db"],
+                pitches=[0, 4, 7, 10, 13],
+            ),
             # 6 notes
-            "C11": "C dominant eleventh",
-            "C7#11": "C dominant sharp eleventh",
-            "Cmaj11": "C major eleventh",
-            "Cm11": "C minor eleventh",
+            "C11": ChordInfo(
+                description="C dominant eleventh",
+                notes=["C", "E", "G", "Bb", "D", "F"],
+                pitches=[0, 4, 7, 10, 14, 17],
+            ),
+            "C7#11": ChordInfo(
+                description="C dominant sharp eleventh",
+                notes=["C", "E", "G", "Bb", "D", "F#"],
+                pitches=[0, 4, 7, 10, 14, 18],
+            ),
+            "Cmaj11": ChordInfo(
+                description="C major eleventh",
+                notes=["C", "E", "G", "B", "D", "F"],
+                pitches=[0, 4, 7, 11, 14, 17],
+            ),
+            "Cm11": ChordInfo(
+                description="C minor eleventh",
+                notes=["C", "Eb", "G", "Bb", "D", "F"],
+                pitches=[0, 3, 7, 10, 14, 17],
+            ),
             # other
-            "C/B": "C major triad over B",
+            "Abm": ChordInfo(
+                description="Ab minor triad",
+                notes=["Ab", "Cb", "Eb"],
+                pitches=[8, 11, 15],
+            ),
+            "B/A": ChordInfo(
+                description="B major triad over A",
+                notes=["A", "B", "D#", "F#"],
+                pitches=[9, 11, 15, 18],
+            ),
+            "C/B": ChordInfo(
+                description="C major triad over B",
+                notes=["B", "C", "E", "G"],
+                pitches=[-1, 0, 4, 7],
+            ),
+            "Cbm": ChordInfo(
+                description="Cb minor triad",
+                notes=["Cb", "Ebb", "Gb"],
+                pitches=[11, 14, 18],
+            ),
+            "C#": ChordInfo(
+                description="C# major triad",
+                notes=["C#", "E#", "G#"],
+                pitches=[1, 5, 8],
+            ),
+            "C#7": ChordInfo(
+                description="C# dominant seventh",
+                notes=["C#", "E#", "G#", "B"],
+                pitches=[1, 5, 8, 11],
+            ),
+            "D/C": ChordInfo(
+                description="D major triad over C",
+                notes=["C", "D", "F#", "A"],
+                pitches=[0, 2, 6, 9],
+            ),
+            "Dm7b5": ChordInfo(
+                description="D minor seventh flat five",
+                notes=["D", "F", "Ab", "C"],
+                pitches=[2, 5, 8, 12],
+            ),
+            "E#": ChordInfo(
+                description="E# major triad",
+                notes=["E#", "G##", "B#"],
+                pitches=[5, 9, 12],
+            ),
+            "Fbm": ChordInfo(
+                description="Fb minor triad",
+                notes=["Fb", "Abb", "Cb"],
+                pitches=[4, 7, 11],
+            ),
+            "Gm7": ChordInfo(
+                description="G minor seventh",
+                notes=["G", "Bb", "D", "F"],
+                pitches=[7, 10, 14, 17],
+            ),
         }
-        for name, description in chords.items():
+        for name, info in chords.items():
             with self.subTest(name=name):
-                self.assertEqual(chord_name_to_description(name), description)
+                self.assertEqual(chord_name_to_description(name), info.description)
+                self.assertEqual(chord_name_to_note_names(name), info.notes)
+                self.assertEqual(chord_name_to_pitches(name), info.pitches)
 
     def test_chord_name_to_interval_names(self) -> None:
         self.assertEqual(chord_name_to_interval_names("C"), ["1", "3", "5"])
-
-    def test_chord_name_to_note_names(self) -> None:
-        chords = {
-            # 3 notes
-            "C": ["C", "E", "G"],
-            "Cm": ["C", "Eb", "G"],
-            "Caug": ["C", "E", "G#"],
-            "Cdim": ["C", "Eb", "Gb"],
-            "Csus2": ["C", "D", "G"],
-            "Csus4": ["C", "F", "G"],
-            # 4 notes
-            "C6": ["C", "E", "G", "A"],
-            "Cm6": ["C", "Eb", "G", "A"],
-            "C7": ["C", "E", "G", "Bb"],
-            "C7b5": ["C", "E", "Gb", "Bb"],
-            "Cmaj7": ["C", "E", "G", "B"],
-            "Cm7": ["C", "Eb", "G", "Bb"],
-            "Cm7b5": ["C", "Eb", "Gb", "Bb"],
-            "Cmmaj7": ["C", "Eb", "G", "B"],
-            "Caug7": ["C", "E", "G#", "Bb"],
-            "Caugmaj7": ["C", "E", "G#", "B"],
-            "Cdim7": ["C", "Eb", "Gb", "Bbb"],
-            "Cdimmaj7": ["C", "Eb", "Gb", "B"],
-            "Cadd4": ["C", "E", "F", "G"],
-            "Cmadd4": ["C", "Eb", "F", "G"],
-            "Cadd9": ["C", "E", "F", "D"],
-            "Cmadd9": ["C", "Eb", "F", "D"],
-            # 5 notes
-            "C9": ["C", "E", "G", "Bb", "D"],
-            "Cmaj9": ["C", "E", "G", "B", "D"],
-            "Cm9": ["C", "Eb", "G", "Bb", "D"],
-            "C7b9": ["C", "E", "G", "Bb", "Db"],
-            # 6 notes
-            "C11": ["C", "E", "G", "Bb", "D", "F"],
-            "C7#11": ["C", "E", "G", "Bb", "D", "F#"],
-            "Cmaj11": ["C", "E", "G", "B", "D", "F"],
-            "Cm11": ["C", "Eb", "G", "Bb", "D", "F"],
-            # other
-            "Abm": ["Ab", "Cb", "Eb"],
-            "Cbm": ["Cb", "Ebb", "Gb"],
-            "C#": ["C#", "E#", "G#"],
-            "C#7": ["C#", "E#", "G#", "B"],
-            "Dm7b5": ["D", "F", "Ab", "C"],
-            "E#": ["E#", "G##", "B#"],
-            "Fbm": ["Fb", "Abb", "Cb"],
-            "Gm7": ["G", "Bb", "D", "F"],
-            "B/A": ["A", "B", "D#", "F#"],
-        }
-        for chord, notes in chords.items():
-            with self.subTest(chord=chord):
-                self.assertEqual(chord_name_to_note_names(chord), notes)
-
-    def test_chord_name_to_pitches(self) -> None:
-        chords = {
-            # 3 notes
-            "C": [0, 4, 7],
-            "Cm": [0, 3, 7],
-            "Caug": [0, 4, 8],
-            "Cdim": [0, 3, 6],
-            # 4 notes
-            "C6": [0, 4, 7, 9],
-            "Cm6": [0, 3, 7, 9],
-            "C7": [0, 4, 7, 10],
-            "C7b5": [0, 4, 6, 10],
-            "Cmaj7": [0, 4, 7, 11],
-            "Cm7": [0, 3, 7, 10],
-            "Cm7b5": [0, 3, 6, 10],
-            "Cmmaj7": [0, 3, 7, 11],
-            "Caug7": [0, 4, 8, 10],
-            "Caugmaj7": [0, 4, 8, 11],
-            "Cdim7": [0, 3, 6, 9],
-            "Cdimmaj7": [0, 3, 6, 11],
-            "Cadd4": [0, 4, 5, 7],
-            "Cmadd4": [0, 3, 5, 7],
-            "Cadd9": [0, 4, 5, 14],
-            "Cmadd9": [0, 3, 5, 14],
-            # 5 notes
-            "C9": [0, 4, 7, 10, 14],
-            "Cmaj9": [0, 4, 7, 11, 14],
-            "Cm9": [0, 3, 7, 10, 14],
-            "C7b9": [0, 4, 7, 10, 13],
-            # 6 notes
-            "C11": [0, 4, 7, 10, 14, 17],
-            "C7#11": [0, 4, 7, 10, 14, 18],
-            "Cmaj11": [0, 4, 7, 11, 14, 17],
-            "Cm11": [0, 3, 7, 10, 14, 17],
-            # other
-            "D/C": [0, 2, 6, 9],
-            "C/B": [-1, 0, 4, 7],
-        }
-        key = "C"
-        for name, pitches in chords.items():
-            with self.subTest(name=name, key=key):
-                self.assertEqual(chord_name_to_pitches(name), pitches)
