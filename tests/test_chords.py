@@ -136,10 +136,14 @@ class ChordsTest(unittest.TestCase):
             "Cmaj11": ["C", "E", "G", "B", "D", "F"],
             "Cm11": ["C", "Eb", "G", "Bb", "D", "F"],
             # other
+            "Abm": ["Ab", "Cb", "Eb"],
+            "Cbm": ["Cb", "Ebb", "Gb"],
             "C#": ["C#", "E#", "G#"],
             "C#7": ["C#", "E#", "G#", "B"],
+            "Dm7b5": ["D", "F", "Ab", "C"],
             "E#": ["E#", "G##", "B#"],
             "Fbm": ["Fb", "Abb", "Cb"],
+            "Gm7": ["G", "Bb", "D", "F"],
             "B/A": ["A", "B", "D#", "F#"],
         }
         for chord, notes in chords.items():
